@@ -7,6 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from starlette.middleware.sessions import SessionMiddleware
 from uuid import UUID
+from dotenv import load_dotenv
 
 from routers import auth
 from core.security import cookie, SessionData, backend, optional_cookie
@@ -43,12 +44,14 @@ from utils import (
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+load_dotenv()
+
 # --- FastAPI App Initialization ---
 app = FastAPI(title="Lvxin API")
 
 # --- Middleware ---
 # Important: The secret key should be loaded from a secure source, e.g., environment variables
-app.add_middleware(SessionMiddleware, secret_key="your-super-secret-key")
+app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET_KEY", "your-super-secret-key"))
 
 # --- Routers ---
 app.include_router(auth.router)

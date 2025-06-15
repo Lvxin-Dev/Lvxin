@@ -89,6 +89,4 @@ DB_USER=postgres
 DB_PASSWORD=1234
 DB_NAME=lvxin
 DB_PORT=5432
-```
-
-**Note:** The `SESSION_SECRET_KEY` in `main.py` is hardcoded. It is recommended to move this to the `.env` file as well. 
+``` 
