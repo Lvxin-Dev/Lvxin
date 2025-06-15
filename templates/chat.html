@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LVXIN Legal - Chat Engine</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Poppins font and FontAwesome for icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #4a90e2;
+      --secondary: #50e3c2;
+      --gradient-start: #4a90e2;
+      --gradient-end: #50e3c2;
+      --sidebar-bg: linear-gradient(180deg, var(--primary), var(--secondary));
+      --navbar-bg: #fff;
+      --navbar-bg-dark: #23272f;
+      --card-bg: #fff;
+      --card-bg-dark: #23272f;
+      --body-bg: #f5f7fa;
+      --body-bg-dark: #181c23;
+      --text-primary: #23272f;
+      --text-primary-dark:rgb(0, 0, 0);
+      --text-secondary: #6b7a90;
+      --text-secondary-dark: #b0b8c1;
+    }
+    [data-theme="dark"] {
+      --navbar-bg: var(--navbar-bg-dark);
+      --card-bg: var(--card-bg-dark);
+      --body-bg: var(--body-bg-dark);
+      --text-primary: var(--text-primary-dark);
+      --text-secondary: var(--text-secondary-dark);
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
+      background: var(--body-bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 80px;
+      background: var(--navbar-bg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(74, 144, 226, 0.07);
+    }
+    .logo img {
+      height: 48px;
+      border-radius: 8px;
+    }
+    .nav-links a {
+      margin: 0 1rem;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: var(--primary);
+      margin-right: 0.5rem;
+    }
+    .profile-component {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 500;
+      gap: 0.5rem;
+    }
+    .profile-image {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .profile-name {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+    .sidebar {
+      position: fixed;
+      top: 80px;
+      left: 0;
+      width: 240px;
+      height: calc(100vh - 80px);
+      background: var(--sidebar-bg);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      padding: 2rem 1rem 1rem 1rem;
+      z-index: 90;
+      box-shadow: 2px 0 8px rgba(74, 144, 226, 0.07);
+    }
+    .nav-section {
+      margin-bottom: 2rem;
+    }
+    .nav-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      letter-spacing: 1px;
+      color: #fff;
+      opacity: 0.8;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.7rem 1rem;
+      border-radius: 8px;
+      color: #fff;
+      text-decoration: none;
+      font-size: 1rem;
+      margin-bottom: 0.3rem;
+      transition: background 0.2s;
+    }
+    .nav-item.active, .nav-item:hover {
+      background: rgba(255,255,255,0.15);
+    }
+.main-content {
+  margin-left: 260px; /* match .gpt-sidebar width */
+  margin-top: 80px;
+  height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+  background: var(--body-bg);
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+}
+    /* Chat Engine Styles (adapted to card style) */
+
+.chat-header {
+  height: 64px;
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #fff;
+  letter-spacing: 1px;
+  border-bottom: 1px solid #e3e8f0;
+  top: 80px;
+  left: 260px; /* match .gpt-sidebar width */
+  right: 0;
+  z-index: 10;
+  position: fixed; /* add this if not already */
+}
+.chat-messages {
+  position: absolute;
+  top: 64px; /* height of .chat-header */
+  bottom: 80px; /* height of input area */
+  left: 0;
+  right: 0;
+  padding: 24px 0 24px 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: var(--body-bg);
+}
+
+    .message {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 1rem;
+      line-height: 1.5;
+      word-break: break-word;
+      box-shadow: 0 2px 8px rgba(74,144,226,0.10);
+      animation: fadeIn 0.3s;
+    }
+    .message.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, var(--gradient-end), var(--gradient-start) 80%);
+      color: #23272f;
+      border-bottom-right-radius: 4px;
+    }
+    .message.bot {
+      align-self: flex-start;
+      background: linear-gradient(135deg, var(--primary), var(--secondary) 80%);
+      color: #fff;
+      border-bottom-left-radius: 4px;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+.chat-input-area {
+  left: 260px; /* match .gpt-sidebar width */
+  right: 0;
+  bottom: 0;
+  background: var(--body-bg);
+  border-top: 1px solid #e3e8f0;
+  display: flex;
+  gap: 10px;
+  padding: 16px 24px;
+  z-index: 20;
+  position: fixed; /* add this if not already */
+}
+
+.chat-input {
+  flex: 1;
+  padding: 14px;
+  border-radius: 8px;
+  border: 1px solid #e3e8f0;
+  background: var(--body-bg);
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  outline: none;
+  resize: none;
+  overflow-y: hidden;
+  min-height: 44px; /* or whatever fits your design */
+  max-height: 200px; /* optional: limit max height */
+}
+.chat-input:focus {
+  background: #f0f4fa;
+}
+  .send-btn {
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0 24px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+    box-shadow: 0 2px 8px rgba(74,144,226,0.12);
+  }
+    .send-btn:hover {
+      filter: brightness(1.1);
+    }
+    /* Add to your <style> section */
+.gpt-sidebar {
+  position: fixed;
+  top: 80px;
+  left: 0;
+  bottom: 0;
+  width: 260px;
+  background: var(--navbar-bg-dark, #23272f);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  z-index: 99;
+  border-right: 1px solid #222831;
+  transition: width 0.2s;
+}
+.gpt-sidebar-top {
+  padding: 18px 16px 8px 16px;
+  border-bottom: 1px solid #222831;
+}
+.gpt-newchat-btn {
+  width: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+.gpt-newchat-btn:hover {
+  filter: brightness(1.1);
+}
+.gpt-convo-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.gpt-convo-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-size: 1rem;
+  color: #b0b8c1;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.gpt-convo-item.active,
+.gpt-convo-item:hover {
+  background: rgba(80, 227, 194, 0.12);
+  color: #fff;
+}
+.gpt-sidebar-bottom {
+  padding: 16px;
+  border-top: 1px solid #222831;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.gpt-sidebar-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+}
+.gpt-sidebar-profile img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.gpt-sidebar-settings {
+  background: none;
+  border: none;
+  color: #b0b8c1;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.gpt-sidebar-settings:hover {
+  color: var(--primary);
+}
+@media (max-width: 900px) {
+  .gpt-sidebar {
+    width: 60px;
+  }
+  .gpt-sidebar-top span,
+  .gpt-convo-item span,
+  .gpt-sidebar-profile span {
+    display: none;
+  }
+  .gpt-newchat-btn {
+    justify-content: center;
+    padding: 12px 0;
+  }
+  .gpt-convo-item {
+    justify-content: center;
+    padding: 10px 0;
+  }
+  .gpt-sidebar-bottom {
+    justify-content: center;
+    padding: 16px 0;
+  }
+}
+    /* Responsive Design */
+    @media (max-width: 900px) {
+      .sidebar {
+        display: none;
+      }
+      .main-content, .chat-header, .chat-input-area {
+      margin-left: 0;
+      left: 0;
+  }
+    }
+    @media (max-width: 600px) {
+      .navbar {
+        padding: 0 1rem;
+      }
+      .main-content {
+        padding: 1rem 0.2rem;
+      }
+
+    }
+  </style>
+  
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="logo">
+      <a href="welcome_page">
+        <img src="../static/images/logo.jpg" alt="绿信标志">
+      </a>
+      <a href="upload_contract">
+        <img src="../static/images/main.jfif" alt="绿信标志">
+      </a>
+    </div>
+    <div class="actions">
+      <button id="themeToggle" class="icon-btn">
+        <i class="fas fa-moon"></i>
+      </button>
+      <a href="profile" class="profile-component">
+        <img src="../static/images/profile.jpeg" class="profile-image" alt="个人资料图片">
+        <span class="profile-name">{{name}}</span>
+      </a>
+    </div>
+  </nav>
+  <!-- Sidebar (ChatGPT style) -->
+<aside class="gpt-sidebar" id="gptSidebar">
+  <div class="gpt-sidebar-top">
+    <button class="gpt-newchat-btn">
+      <i class="fas fa-plus"></i>
+      <span>新建聊天</span>
+    </button>
+  </div>
+  <div class="gpt-convo-list" id="gptConvoList">
+    <div class="gpt-convo-item active">
+      <i class="fas fa-message"></i>
+      <span>今天的对话</span>
+    </div>
+    <div class="gpt-convo-item">
+      <i class="fas fa-message"></i>
+      <span>法律咨询</span>
+    </div>
+    <div class="gpt-convo-item">
+      <i class="fas fa-message"></i>
+      <span>合同分析</span>
+    </div>
+    <!-- Add more as needed -->
+  </div>
+
+</aside>
+
+  <!-- Main Content -->
+<main class="main-content">
+  <div class="chat-header">
+    <span>💬 LVXIN 智能聊天引擎</span>
+  </div>
+  <div class="chat-messages" id="chat-messages"></div>
+  <form class="chat-input-area" id="chat-form" autocomplete="off">
+    <textarea class="chat-input" id="chat-input" placeholder="请输入您的消息..." required rows="1"></textarea>
+    <button type="submit" class="send-btn">发送</button>
+  </form>
+</main>
+  <script>
+    // Theme Toggle
+    const themeToggle = document.getElementById('themeToggle');
+    let isDarkMode = localStorage.getItem('darkMode') === 'true';
+
+    function toggleTheme() {
+      isDarkMode = !isDarkMode;
+      document.body.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+      themeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+      localStorage.setItem('darkMode', isDarkMode);
+    }
+    themeToggle.addEventListener('click', toggleTheme);
+    document.body.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+    themeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+
+    // Chat Engine
+    const chatMessages = document.getElementById('chat-messages');
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chat-input');
+
+        const textarea = document.getElementById('chat-input');
+    textarea.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = this.scrollHeight + 'px';
+    });
+    function appendMessage(text, sender) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'message ' + sender;
+      if (sender === 'bot') {
+        // Render markdown to HTML for bot messages
+        msgDiv.innerHTML = marked.parse(text);
+      } else {
+        // For user, just show plain text
+        msgDiv.textContent = text;
+      }
+      chatMessages.appendChild(msgDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    chatForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const userMsg = chatInput.value.trim();
+      if (!userMsg) return;
+      appendMessage(userMsg, 'user');
+      chatInput.value = '';
+      chatInput.focus();
+
+      // Show loading indicator
+      const loadingMsg = document.createElement('div');
+      loadingMsg.className = 'message bot';
+      loadingMsg.textContent = '...';
+      chatMessages.appendChild(loadingMsg);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      try {
+        const response = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: userMsg })
+        });
+        const data = await response.json();
+        loadingMsg.remove();
+        appendMessage(data.response || '[无回复]', 'bot');
+      } catch (err) {
+        loadingMsg.remove();
+        appendMessage('错误：无法连接服务器。', 'bot');
+      }
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</body>
+</html>

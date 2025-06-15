@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LVXIN Legal - Users Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../static/CSS/stylee.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .dashboard-header h1 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 600;
+        }
+        .dashboard-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+        }
+        .metric-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.08);
+            padding: 2rem 1rem;
+            text-align: center;
+            transition: box-shadow 0.2s;
+        }
+        .metric-card:hover {
+            box-shadow: 0 8px 24px rgba(74, 144, 226, 0.18);
+        }
+        .metric-icon {
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        .metric-title {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .metric-value {
+            font-size: 2.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .dashboard-chart-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.08);
+            padding: 2rem 1rem;
+        }
+        @media (max-width: 900px) {
+            .dashboard-metrics {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (max-width: 700px) {
+            .dashboard-metrics {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <a href="welcome_page">
+                <img src="../static/images/logo.jpg" alt="绿信标志">
+            </a>
+        </div>
+        <div class="nav-links">
+            <a href="subscriptions" class="en-content">定价</a>
+            <a href="aboutus" class="en-content">关于我们</a>
+            <a href="helpcenter" class="en-content">帮助中心</a>
+        </div>
+        <div class="actions">
+            <button id="themeToggle" class="icon-btn">
+                <i class="fas fa-moon"></i>
+            </button>
+            <script src="https://static.elfsight.com/platform/platform.js" async></script>
+            <div class="elfsight-app-fce75b10-069c-41d5-bca0-09c33e812801" data-elfsight-app-lazy></div>
+            <a href="profile" class="profile-component">
+                <img src="../static/images/profile.jpeg" class="profile-image" alt="个人资料图片">
+                <span class="profile-name">{{name}}</span>
+            </a>
+        </div>
+    </nav>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="nav-section">
+            <div class="nav-title">团队数据库</div>
+            <a href="mydash" class="nav-item active" > <i class="fas fa-bar-chart"></i> 上传合同 </a>
+            <a href="upload_contract" class="nav-item"> <i class="fas fa-file-upload"></i> 上传合同 </a>
+            <a href="history" class="nav-item"> <i class="fas fa-history"></i> 分析历史 </a>
+            <a href="analysis" class="nav-item"> <i class="fas fa-folder-open"></i> 文档分析 </a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-title">账户</div>
+            <a href="profile" class="nav-item"> <i class="fas fa-user"></i> 用户资料 </a>
+            <a href="subscriptions" class="nav-item"> <i class="fas fa-star"></i> 订阅 </a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-title">支持</div>
+            <a href="contactus" class="nav-item"> <i class="fas fa-envelope"></i> 联系我们 </a>
+            <a href="helpcenter" class="nav-item"> <i class="fas fa-question-circle"></i> 常见问题 </a>
+            <a href="aboutus" class="nav-item"> <i class="fas fa-info-circle"></i> 关于我们 </a>
+            <a href="whats-new" class="nav-item "><i class="fas fa-info-circle"></i>有什么新的</a>
+        </div>
+    </nav>
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="dashboard-header">
+            <h1>用户仪表盘</h1>
+            <p>您的合同分析活动一览</p>
+        </div>
+        <div class="dashboard-metrics">
+            <div class="metric-card">
+                <div class="metric-icon"><i class="fas fa-file-contract"></i></div>
+                <div class="metric-title">上传合同数</div>
+                <div class="metric-value" id="contractsCount">{{contract_number}}</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon"><i class="fas fa-file-alt"></i></div>
+                <div class="metric-title">上传页面数</div>
+                <div class="metric-value" id="pagesCount">{{contract_pages}}</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon"><i class="fas fa-font"></i></div>
+                <div class="metric-title">上传字数</div>
+                <div class="metric-value" id="wordsCount">{{contract_characters}}</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon"><i class="fas fa-yen-sign"></i></div>
+                <div class="metric-title">应付金额 (¥)</div>
+                <div class="metric-value" id="paymentAmount">¥{{contract_cost}}</div>
+            </div>
+        </div>
+   <div class="dashboard-chart-section" style="margin-top: 16px;">
+        <canvas id="userChart" height="60"></canvas>
+    </div>
+</main>
+
+<script>
+    // Extract backend-rendered values from the DOM
+    const contracts = parseInt(document.getElementById('contractsCount').textContent.replace(/,/g, '')) || 0;
+    const pages = parseInt(document.getElementById('pagesCount').textContent.replace(/,/g, '')) || 0;
+    const words = parseInt(document.getElementById('wordsCount').textContent.replace(/,/g, '')) || 0;
+    const payment = parseFloat(document.getElementById('paymentAmount').textContent.replace(/[¥,]/g, '')) || 0;
+
+    // You can set other values as needed, or fetch from backend if available
+    const activeDays = 21; // Example static value
+    const avgWordsPerContract = contracts > 0 ? Math.round(words / contracts) : 0;
+
+    // Chart.js bar chart
+    const ctx = document.getElementById('userChart').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['合同数', '页面数', '字数 (千)', '活跃天数'],
+            datasets: [{
+                label: '用户活动',
+                data: [contracts, pages, words / 1000, activeDays],
+                backgroundColor: [
+                    '#3182ce',
+                    '#63b3ed',
+                    '#90cdf4',
+                    '#2b6cb0'
+                ],
+                borderRadius: 6
+            }]
+        },
+        options: {
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 10, font: { size: 10 } }
+                },
+                x: {
+                    ticks: { font: { size: 10 } }
+                }
+            }
+        }
+    });
+
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        let isDarkMode = localStorage.getItem('darkMode') === 'true';
+
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            document.body.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+            themeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            localStorage.setItem('darkMode', isDarkMode);
+        }
+
+        themeToggle.addEventListener('click', toggleTheme);
+        document.body.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+        themeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    </script>
+</body>
+</html>
