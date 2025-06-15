@@ -31,8 +31,15 @@ This is a web application built with FastAPI for uploading, analyzing, and manag
     ```
 
 2.  **Create and activate a virtual environment:**
+
+    We recommend using `virtualenv` as it is more robust. The standard `venv` module may fail in some environments.
+
     ```bash
-    python -m venv venv
+    # Install virtualenv if you don't have it
+    pip install virtualenv
+
+    # Create and activate the environment
+    virtualenv venv
     source venv/bin/activate
     ```
 
@@ -64,14 +71,25 @@ The frontend is built with Jinja2 templates and is served directly by the FastAP
 Run the following command from the root of the project:
 
 ```bash
-uvicorn main:app --reload
+uvicorn main:app --host 127.0.0.1 --port 8000
 ```
 
 The application will be available at `http://127.0.0.1:8000`.
 
+### **Troubleshooting**
+
+If you encounter a `ModuleNotFoundError` for a package that is listed in `requirements.txt` and appears to be installed (e.g., `email-validator`), your Python interpreter might not be looking in the virtual environment's `site-packages` directory. You can force it to by setting the `PYTHONPATH` variable before running the application:
+
+```bash
+export PYTHONPATH=$(pwd)/venv/lib/python3.12/site-packages
+uvicorn main:app --host 127.0.0.1 --port 8000
+```
+*Note: Adjust the python version in the path if you are using a different one.*
+
+
 ## Environment Variables
 
-Create a `.env` file in the root of the project and add the following variables. A `.env.example` is not provided, but you can create one from the following:
+Create a `.env` file in the root of the project and add the following variables.
 
 ```
 access_id=your_access_id_here
