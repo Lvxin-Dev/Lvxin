@@ -44,11 +44,12 @@ This is a web application built with FastAPI for uploading, analyzing, and manag
 4.  **Set up the database:**
     - Make sure you have PostgreSQL installed and running.
     - Create a database named `lvxin`.
-    - The application expects the following credentials (currently hardcoded in `core/database.py`):
-      - **Host**: `localhost`
-      - **User**: `postgres`
-      - **Password**: `1234`
-      - **Port**: `5432`
+    - The application expects the following credentials (loaded from environment variables, with defaults for local development):
+      - **DB_HOST**: `localhost`
+      - **DB_USER**: `postgres`
+      - **DB_PASSWORD**: `1234`
+      - **DB_NAME**: `lvxin`
+      - **DB_PORT**: `5432`
     - To restore the database from the provided dump file, run:
       ```bash
       psql -U postgres -d lvxin < db_dump.sql
@@ -81,6 +82,13 @@ GOOGLE_CLIENT_SECRET=your_google_client_secret
 SESSION_SECRET_KEY=a_long_random_string
 WECHAT_CLIENT_ID=your_wechat_app_id_here
 WECHAT_CLIENT_SECRET=your_wechat_app_secret_here
+
+# Database credentials
+DB_HOST=localhost
+DB_USER=postgres
+DB_PASSWORD=1234
+DB_NAME=lvxin
+DB_PORT=5432
 ```
 
-**Note:** The `SESSION_SECRET_KEY` in `main.py` is hardcoded. It is recommended to move this to the `.env` file as well. The same applies to the database credentials in `core/database.py`. 
+**Note:** The `SESSION_SECRET_KEY` in `main.py` is hardcoded. It is recommended to move this to the `.env` file as well. 
