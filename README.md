@@ -11,7 +11,7 @@ This is a web-based platform for uploading and analyzing legal contracts. It fea
 - **Database Tracking**: Upload sessions are tracked in a PostgreSQL database for persistence.
 - **Automated Cleanup**: A cleanup script is provided to remove stale or failed uploads.
 
-## Tech Stack
+## Tech-Stack
 
 - **Backend**: FastAPI, Python 3.12
 - **Database**: PostgreSQL
