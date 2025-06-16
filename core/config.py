@@ -1,5 +1,6 @@
 from authlib.integrations.starlette_client import OAuth
 from starlette.config import Config
+import httpx
 
 config = Config(".env")
 
@@ -20,12 +21,18 @@ WECHAT_CLIENT_SECRET = config("WECHAT_CLIENT_SECRET", cast=str, default=None)
 # --- Authlib OAuth Registry ---
 oauth = OAuth(config)
 
+# Define a longer timeout for connections
+timeout = httpx.Timeout(10.0, connect=30.0)
+
 # Google Provider
 if GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET:
     oauth.register(
         name="google",
         server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
-        client_kwargs={"scope": "openid email profile"},
+        client_kwargs={
+            "scope": "openid email profile",
+            "timeout": timeout,
+        },
         client_id=GOOGLE_CLIENT_ID,
         client_secret=GOOGLE_CLIENT_SECRET,
     )

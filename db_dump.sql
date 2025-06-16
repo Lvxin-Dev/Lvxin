@@ -17,6 +17,17 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
+-- Name: upload_status; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.upload_status AS ENUM (
+    'in_progress',
+    'completed',
+    'failed'
+);
+
+
+--
 -- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -161,11 +172,55 @@ ALTER TABLE ONLY public.users
 
 
 --
+-- Name: file_upload_sessions; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.file_upload_sessions (
+    id uuid PRIMARY KEY,
+    user_id uuid NOT NULL,
+    file_name character varying(255) NOT NULL,
+    file_size bigint NOT NULL,
+    mime_type character varying(255),
+    status public.upload_status DEFAULT 'in_progress' NOT NULL,
+    uploaded_size bigint DEFAULT 0 NOT NULL,
+    storage_path text,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    expires_at timestamp with time zone NOT NULL,
+    final_file_id integer
+);
+
+
+ALTER TABLE public.file_upload_sessions OWNER TO postgres;
+
+--
+-- Name: file_upload_sessions file_upload_sessions_final_file_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.file_upload_sessions
+    ADD CONSTRAINT file_upload_sessions_final_file_id_fkey FOREIGN KEY (final_file_id) REFERENCES public.files(id) ON DELETE SET NULL;
+
+
+--
+-- Name: file_upload_sessions file_upload_sessions_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.file_upload_sessions
+    ADD CONSTRAINT file_upload_sessions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE CASCADE;
+
+
+--
 -- Name: files files_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.files
     ADD CONSTRAINT files_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE CASCADE;
+
+
+--
+-- Name: idx_resumable_uploads; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_resumable_uploads ON public.file_upload_sessions USING btree (user_id, file_name) WHERE (status = 'in_progress'::public.upload_status);
 
 
 --

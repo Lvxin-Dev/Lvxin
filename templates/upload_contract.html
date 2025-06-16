@@ -198,6 +198,60 @@
                 display: none;
             }
         }
+
+        .progress-container {
+            margin-top: 1.5rem;
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 20px;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            text-align: center;
+            line-height: 20px;
+            color: white;
+            font-weight: 600;
+            transition: width 0.4s ease;
+        }
+
+        .status-text {
+            margin-top: 0.5rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-align: center;
+            display: none;
+        }
+
+        .upload-controls {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            display: none;
+        }
+
+        .control-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .pause-btn {
+            background-color: var(--warning);
+            color: white;
+        }
+
+        .resume-btn {
+            background-color: var(--success);
+            color: white;
+        }
     </style>
 </head>
 
@@ -259,114 +313,272 @@
     <main class="main-content">
         <div class="upload-container">
             <div class="logo-header">
-                <div class="main-logo">律心</div>
-                <div class="sub-logo">人工智能合同分析</div>
+                <h1 class="main-logo">智能合同分析</h1>
+                <p class="sub-logo">上传您的合同，获得AI驱动的即时见解</p>
             </div>
             <div class="upload-card">
-                <div class="drag-drop-area">
-                    <i class="fas fa-cloud-upload-alt upload-icon"></i>
-                    <p class="upload-instructions">拖放您的合同文件或点击浏览</p>
-                    <p class="file-requirements">支持格式：PDF、DOCX、DOC • 最大文件大小：25MB</p>
-                    <div id="fileList" class="selected-file"></div>
-                </div>
-                <input type="file" id="file-input" hidden accept=".pdf,.docx,.doc">
-                <button class="analyze-btn" onclick="handleAnalysis()">分析文档</button>
+                <form id="uploadForm">
+                    <div class="drag-drop-area" id="dragDropArea">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <p class="upload-instructions">拖放文件到此处或 <strong>点击上传</strong></p>
+                        <input type="file" id="fileInput" hidden>
+                    </div>
+                    <p class="file-requirements">(支持的文件类型: PDF, DOC, DOCX)</p>
+                    <div id="selectedFile" class="selected-file"></div>
+
+                    <div id="progressContainer" class="progress-container">
+                        <div id="progressBar" class="progress-bar">0%</div>
+                    </div>
+                    <div id="statusText" class="status-text"></div>
+                    <div id="uploadControls" class="upload-controls">
+                        <button type="button" id="pauseBtn" class="control-btn pause-btn">暂停</button>
+                        <button type="button" id="resumeBtn" class="control-btn resume-btn">继续</button>
+                    </div>
+
+                    <select class="contract-type-select" name="contract_type" required>
+                        <option value="" disabled selected>选择合同类型</option>
+                        <option value="nda">保密协议</option>
+                        <option value="employment">劳动合同</option>
+                        <option value="lease">租赁协议</option>
+                        <option value="service">服务协议</option>
+                    </select>
+                    <button type="submit" class="analyze-btn">分析合同</button>
+                </form>
             </div>
         </div>
     </main>
-</body>
-<script>
-    // Theme Toggle
-    const themeToggle = document.getElementById('themeToggle');
-    let isDarkMode = localStorage.getItem('darkMode') === 'true';
 
-    function toggleTheme() {
-        isDarkMode = !isDarkMode;
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        let isDarkMode = localStorage.getItem('darkMode') === 'true';
+
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            document.body.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+            themeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            localStorage.setItem('darkMode', isDarkMode);
+        }
+
+        themeToggle.addEventListener('click', toggleTheme);
         document.body.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
         themeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-        localStorage.setItem('darkMode', isDarkMode);
-    }
 
-    themeToggle.addEventListener('click', toggleTheme);
-    document.body.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
-    themeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        // Resumable Upload Logic
+        const uploadForm = document.getElementById('uploadForm');
+        const fileInput = document.getElementById('fileInput');
+        const dragDropArea = document.getElementById('dragDropArea');
+        const selectedFileDisplay = document.getElementById('selectedFile');
 
-    // File Upload Handling
-    const dropZone = document.querySelector('.drag-drop-area');
-    const fileInput = document.getElementById('file-input');
-    const fileList = document.getElementById('fileList');
-    const analyzeBtn = document.querySelector('.analyze-btn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const statusText = document.getElementById('statusText');
+        const uploadControls = document.getElementById('uploadControls');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resumeBtn = document.getElementById('resumeBtn');
 
-    dropZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        dropZone.classList.add('dragover');
-    });
+        let currentFile = null;
+        let uploadId = null;
+        let isPaused = false;
+        const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
 
-    dropZone.addEventListener('dragleave', () => {
-        dropZone.classList.remove('dragover');
-    });
+        dragDropArea.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => handleFileSelect(e.target.files[0]));
 
-    dropZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        const files = e.dataTransfer.files;
-        if (files.length) {
-            fileInput.files = files;
-            displayFileName(files[0]);
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dragDropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
         }
-        dropZone.classList.remove('dragover');
-    });
 
-    fileInput.addEventListener('change', (e) => {
-        if (e.target.files.length) {
-            displayFileName(e.target.files[0]);
+        dragDropArea.addEventListener('dragenter', () => dragDropArea.classList.add('dragover'));
+        dragDropArea.addEventListener('dragleave', () => dragDropArea.classList.remove('dragover'));
+        dragDropArea.addEventListener('drop', (e) => {
+            dragDropArea.classList.remove('dragover');
+            handleFileSelect(e.dataTransfer.files[0]);
+        });
+
+        function handleFileSelect(file) {
+            if (!file) return;
+            currentFile = file;
+            selectedFileDisplay.textContent = `Selected File: ${file.name}`;
+            resetUploadState();
         }
-    });
 
-    dropZone.addEventListener('click', () => {
-        fileInput.click();
-    });
-
-    function displayFileName(file) {
-        fileList.textContent = `${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
-    }
-
-    async function handleAnalysis() {
-        if (!fileInput.files.length) {
-            alert('Please select a file first!');
-            return;
+        function resetUploadState() {
+            uploadId = null;
+            isPaused = false;
+            progressContainer.style.display = 'none';
+            progressBar.style.width = '0%';
+            progressBar.textContent = '0%';
+            statusText.style.display = 'none';
+            statusText.textContent = '';
+            uploadControls.style.display = 'none';
         }
         
-        analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
-        analyzeBtn.disabled = true;
-        
-        const formData = new FormData();
-        formData.append('file', fileInput.files[0]);
-        
-        try {
-            // Instead of handling the redirect manually, we'll check the response headers
-            // or just let the browser handle the redirect naturally
-            const response = await fetch('/analyze_upload', {
-                method: 'POST',
-                body: formData,
-            });
-            
-            // Your FastAPI endpoint returns a redirect, not JSON
-            // So we shouldn't try to parse response.json()
-            console.log('Response status:', response.status);
-            
-            // If we somehow get here (we shouldn't normally since browser should redirect),
-            // just redirect manually
-            window.location.href = '/loading';
-            
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Error: ' + error.message);
-            analyzeBtn.innerHTML = 'Analyze Document';
-            analyzeBtn.disabled = false;
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentFile) {
+                alert("Please select a file to upload.");
+                return;
+            }
+            isPaused = false;
+            await startOrResumeUpload();
+        });
+
+        pauseBtn.addEventListener('click', () => {
+            isPaused = true;
+            statusText.textContent = 'Paused';
+        });
+
+        resumeBtn.addEventListener('click', async () => {
+            isPaused = false;
+            statusText.textContent = 'Resuming...';
+            await startOrResumeUpload();
+        });
+
+        async function startOrResumeUpload() {
+            statusText.style.display = 'block';
+            progressContainer.style.display = 'block';
+            uploadControls.style.display = 'flex';
+
+            if (!uploadId) {
+                // Check if a resumable session exists
+                try {
+                    statusText.textContent = 'Checking for existing uploads...';
+                    const res = await fetch(`/uploads/status?file_name=${encodeURIComponent(currentFile.name)}`);
+                    if (res.status === 401) {
+                        window.location.href = '/signin';
+                        return;
+                    }
+                    if (!res.ok) throw new Error('Failed to check status');
+                    const data = await res.json();
+
+                    if (data.resumable) {
+                        const resume = confirm(`An incomplete upload was found for ${currentFile.name}. Do you want to resume?`);
+                        if (resume) {
+                            uploadId = data.upload_id;
+                            await uploadChunks(data.uploaded_size);
+                            return;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Could not check for resumable upload:', error);
+                    // Continue with new upload if status check fails
+                }
+                
+                // If not resuming, initiate a new upload
+                try {
+                    statusText.textContent = 'Initiating upload...';
+                    const initRes = await fetch('/uploads/initiate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            file_name: currentFile.name,
+                            file_size: currentFile.size,
+                            mime_type: currentFile.type
+                        })
+                    });
+                    if (initRes.status === 401) {
+                        window.location.href = '/signin';
+                        return;
+                    }
+                    if (!initRes.ok) throw new Error('Failed to initiate upload');
+                    const initData = await initRes.json();
+                    uploadId = initData.upload_id;
+                    await uploadChunks(0);
+                } catch (error) {
+                    console.error('Upload initiation failed:', error);
+                    statusText.textContent = `Error: ${error.message}`;
+                }
+
+            } else {
+                 // It's a resume from a pause, not a page reload
+                const uploadedSize = parseFloat(progressBar.style.width) / 100 * currentFile.size;
+                await uploadChunks(uploadedSize);
+            }
         }
-    }
-</script>
-<!-- Footer -->
+
+        async function uploadChunks(startFrom) {
+            let start = startFrom;
+            statusText.textContent = 'Uploading...';
+
+            while (start < currentFile.size) {
+                if (isPaused) return;
+
+                const end = Math.min(start + CHUNK_SIZE, currentFile.size);
+                const chunk = currentFile.slice(start, end);
+                
+                try {
+                    const formData = new FormData();
+                    formData.append('chunk', chunk, currentFile.name);
+
+                    const res = await fetch(`/uploads/${uploadId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Range': `bytes ${start}-${end-1}/${currentFile.size}`
+                        },
+                        body: formData
+                    });
+
+                    if (res.status === 401) {
+                        window.location.href = '/signin';
+                        return;
+                    }
+                    if (!res.ok) {
+                       throw new Error(`Chunk upload failed with status ${res.status}`);
+                    }
+                    
+                    const data = await res.json();
+                    start = data.uploaded_size;
+
+                    const percentComplete = Math.round((start / currentFile.size) * 100);
+                    progressBar.style.width = `${percentComplete}%`;
+                    progressBar.textContent = `${percentComplete}%`;
+
+                } catch (error) {
+                    console.error('Chunk upload error:', error);
+                    statusText.textContent = `Error: ${error.message}. Retrying might be possible.`;
+                    isPaused = true;
+                    return;
+                }
+            }
+
+            if(start >= currentFile.size) {
+                 await finishUpload();
+            }
+        }
+
+        async function finishUpload() {
+            statusText.textContent = 'Finalizing upload...';
+            try {
+                const res = await fetch(`/uploads/${uploadId}/finish`, {
+                    method: 'POST'
+                });
+                if (res.status === 401) {
+                    window.location.href = '/signin';
+                    return;
+                }
+                if (!res.ok) throw new Error('Failed to finalize upload');
+                
+                statusText.textContent = 'Upload complete! Analysis started.';
+                uploadControls.style.display = 'none';
+                
+                const data = await res.json();
+                // Redirect or show success message
+                alert(data.message);
+                window.location.href = `/history`;
+
+
+            } catch (error) {
+                console.error('Finish upload error:', error);
+                statusText.textContent = `Error: ${error.message}`;
+            }
+        }
+    </script>
 </body>
 
 </html>

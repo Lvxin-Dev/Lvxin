@@ -9,7 +9,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from uuid import UUID
 from dotenv import load_dotenv
 
-from routers import auth
+from routers import auth, upload
 from core.security import cookie, SessionData, backend, optional_cookie
 from utils import (
     root_page,
@@ -30,7 +30,6 @@ from utils import (
     whats_new_page,
     question_page,
     chat_page,
-    analyze_upload_handler,
     profile_changes_handler,
     delete_file_handler,
     delete_account_handler,
@@ -55,6 +54,7 @@ app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET_KEY",
 
 # --- Routers ---
 app.include_router(auth.router)
+app.include_router(upload.router)
 
 # --- Static Files ---
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -135,10 +135,6 @@ async def handle_chat(req: Request, session_id: UUID = Depends(cookie)):
 
 
 # --- API Endpoint Routes ---
-@app.post("/analyze_upload", tags=["Actions"])
-async def handle_analyze_upload(request: Request, file: UploadFile = File(...), session_id: UUID = Depends(cookie)):
-    return await analyze_upload_handler(request, file, session_id)
-
 @app.post("/profile_changes", tags=["Actions"])
 async def handle_profile_changes(req: Request, profile_data: ProfileUpdate, session_id: UUID = Depends(cookie)):
     return await profile_changes_handler(req, profile_data, session_id)

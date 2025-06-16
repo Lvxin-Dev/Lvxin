@@ -65,7 +65,7 @@ class BasicVerifier(SessionVerifier[UUID, SessionData]):
 
 # Exception for unauthorized access
 auth_exception = HTTPException(
-    status_code=status.HTTP_403_FORBIDDEN, detail="Invalid session"
+    status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid session"
 )
 
 # Initialize the verifier

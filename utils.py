@@ -233,26 +233,6 @@ async def chat_page(req: Request, session_id: UUID = Depends(cookie)):
     return ht_pages.TemplateResponse("chat.html", {"request": req})
 
 # --- POST Handlers ---
-async def analyze_upload_handler(request: Request, file: UploadFile = File(...), session_id: UUID = Depends(cookie)):
-    session_data = await verifier(request)
-    if not allowed_file(file.filename):
-        raise HTTPException(status_code=400, detail="File type not allowed")
-
-    file_path, file_name = save_contract_file(file, session_data.user_id, session_data.username)
-    
-    # OSS Upload and Analysis
-    oss_url = oss_upload(file_path, file_name)
-    report_name = f"{file_name}_report.json"
-    user_folder = os.path.join(USERS_DIR, f"{session_data.user_id}_{session_data.username}")
-    output_filename = os.path.join(user_folder, report_name)
-    
-    api_dep(oss_url, file_name, output_filename)
-    
-    encoded_filename = urllib.parse.quote(file_name)
-    return RedirectResponse(
-        url=f"/analysis?filename={encoded_filename}", status_code=status.HTTP_303_SEE_OTHER
-    )
-
 async def profile_changes_handler(req: Request, profile_data: ProfileUpdate, session_id: UUID = Depends(cookie)):
     session_data = await verifier(req)
     hashed_password = get_password_hash(profile_data.new_password)
@@ -268,14 +248,36 @@ async def profile_changes_handler(req: Request, profile_data: ProfileUpdate, ses
         release_db_connection(conn)
     return RedirectResponse(url="/profile", status_code=status.HTTP_303_SEE_OTHER)
 
-async def delete_file_handler(req: Request, filename: str = Form(...)):
-    # This needs session data to be secure
-    # Simplified version
-    # In a real app, you must verify ownership before deleting
-    os.remove(os.path.join("uploads", filename))
+async def delete_file_handler(req: Request, filename: str = Form(...), session_id: UUID = Depends(cookie)):
+    """Handles deleting a specific file for the logged-in user."""
+    session_data = await verifier(req)
+    if not session_data:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
+
+    user_folder = os.path.join(USERS_DIR, f"{session_data.user_id}_{session_data.username}")
+    file_path = os.path.join(user_folder, filename)
+
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File not found")
+
+    try:
+        os.remove(file_path)
+        logger.info(f"User {session_data.user_id} deleted file: {file_path}")
+
+        # Also remove the associated report if it exists
+        report_path = os.path.join(user_folder, f"{filename}_report.json")
+        if os.path.exists(report_path):
+            os.remove(report_path)
+            logger.info(f"Deleted associated report: {report_path}")
+
+    except OSError as e:
+        logger.error(f"Error deleting file {file_path}: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Could not delete file")
+
     return RedirectResponse(url="/history", status_code=status.HTTP_303_SEE_OTHER)
-    
+
 async def delete_account_handler(req: Request, session_id: UUID = Depends(cookie)):
+    """Handles account deletion."""
     session_data = await verifier(req)
     
     # Delete user folder and data from DB

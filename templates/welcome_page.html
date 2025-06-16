@@ -69,12 +69,22 @@
                 <div class="upload-card">
                     <div class="drag-drop-area">
                         <i class="fas fa-cloud-upload-alt upload-icon"></i>
-                        <p class="upload-instructions">拖放您的合同文件或点击浏览</p>
-                        <p class="file-requirements">支持格式：PDF、DOCX、DOC • 最大文件大小：25MB</p>
-                        <div id="fileList" class="selected-file"></div>
+                        <div class="upload-instructions">拖放文件到此处或 <strong>点击上传</strong></div>
+                        <div class="file-requirements">(支持的文件类型: PDF, DOC, DOCX)</div>
+                        <div class="selected-file" id="selectedFile"></div>
                     </div>
-                    <input type="file" id="file-input" hidden accept=".pdf,.docx,.doc">
-                    <button class="analyze-btn" onclick="handleAnalysis()">分析文档</button>
+                    <input type="file" id="file-input" accept=".pdf,.doc,.docx">
+                    <button class="analyze-btn" id="analyzeBtn">
+                        <i class="fas fa-rocket"></i> 分析合同
+                    </button>
+                    <div class="progress-container" id="progressContainer">
+                        <div class="progress-bar" id="progressBar">0%</div>
+                    </div>
+                    <div class="status-text" id="statusText"></div>
+                    <div class="upload-controls" id="uploadControls">
+                        <button type="button" id="pauseBtn" class="control-btn pause-btn">暂停</button>
+                        <button type="button" id="resumeBtn" class="control-btn resume-btn">继续</button>
+                    </div>
                 </div>
             </div>
 
@@ -313,87 +323,216 @@
         document.body.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
         themeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
 
-        // File Upload Handling
-        const dropZone = document.querySelector('.drag-drop-area');
+        // Resumable Upload Logic
+        const analyzeBtn = document.getElementById('analyzeBtn');
         const fileInput = document.getElementById('file-input');
-        const fileList = document.getElementById('fileList');
-        const analyzeBtn = document.querySelector('.analyze-btn');
+        const dragDropArea = document.querySelector('.drag-drop-area');
+        const selectedFileDisplay = document.getElementById('selectedFile');
 
-        dropZone.addEventListener('dragover', (e) => {
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const statusText = document.getElementById('statusText');
+        const uploadControls = document.getElementById('uploadControls');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resumeBtn = document.getElementById('resumeBtn');
+
+        let currentFile = null;
+        let uploadId = null;
+        let isPaused = false;
+        const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
+
+        dragDropArea.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => handleFileSelect(e.target.files[0]));
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dragDropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
             e.preventDefault();
-            dropZone.classList.add('dragover');
-        });
-
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('dragover');
-        });
-
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            const files = e.dataTransfer.files;
-            if (files.length) {
-                fileInput.files = files;
-                displayFileName(files[0]);
-            }
-            dropZone.classList.remove('dragover');
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length) {
-                displayFileName(e.target.files[0]);
-            }
-        });
-
-        dropZone.addEventListener('click', () => {
-            fileInput.click();
-        });
-
-        function displayFileName(file) {
-            fileList.textContent = `${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+            e.stopPropagation();
         }
 
-        async function handleAnalysis() {
-            const fileInput = document.getElementById('file-input');
-            const analyzeBtn = document.querySelector('.analyze-btn');
-        
-            if (!fileInput.files.length) {
-                alert('Please select a file first!');
+        dragDropArea.addEventListener('dragenter', () => dragDropArea.classList.add('dragover'));
+        dragDropArea.addEventListener('dragleave', () => dragDropArea.classList.remove('dragover'));
+        dragDropArea.addEventListener('drop', (e) => {
+            dragDropArea.classList.remove('dragover');
+            handleFileSelect(e.dataTransfer.files[0]);
+        });
+
+        function handleFileSelect(file) {
+            if (!file) return;
+            currentFile = file;
+            selectedFileDisplay.textContent = `Selected File: ${file.name}`;
+            resetUploadState();
+        }
+
+        function resetUploadState() {
+            uploadId = null;
+            isPaused = false;
+            progressContainer.style.display = 'none';
+            progressBar.style.width = '0%';
+            progressBar.textContent = '0%';
+            statusText.style.display = 'none';
+            statusText.textContent = '';
+            uploadControls.style.display = 'none';
+        }
+
+        analyzeBtn.addEventListener('click', async () => {
+            if (!currentFile) {
+                alert("Please select a file to upload.");
                 return;
             }
-        
-            analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
-            analyzeBtn.disabled = true;
-        
-            const formData = new FormData();
-            formData.append('file', fileInput.files[0]);
-        
-            try {
-                const response = await fetch('/analyze_upload', {
-                    method: 'POST',
-                    body: formData
-                });
-        
-                // Check if the response is a redirect (status 303)
-                if (response.redirected) {
-                    // Follow the redirect by updating the browser's location
-                    window.location.href = response.url;
-                } else if (response.ok) {
-                    // If the response is not a redirect but still OK, try parsing JSON
-                    const result = await response.json();
-                    console.log('File URL:', result.file_url);
-                    window.location.href = result.redirect;
-                } else {
-                    // Handle non-OK responses
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Analysis failed');
+            isPaused = false;
+            await startOrResumeUpload();
+        });
+
+        pauseBtn.addEventListener('click', () => {
+            isPaused = true;
+            statusText.textContent = 'Paused';
+        });
+
+        resumeBtn.addEventListener('click', async () => {
+            isPaused = false;
+            statusText.textContent = 'Resuming...';
+            await startOrResumeUpload();
+        });
+
+        async function startOrResumeUpload() {
+            statusText.style.display = 'block';
+            progressContainer.style.display = 'block';
+            uploadControls.style.display = 'flex';
+
+            if (!uploadId) {
+                // Check if a resumable session exists
+                try {
+                    statusText.textContent = 'Checking for existing uploads...';
+                    const res = await fetch(`/uploads/status?file_name=${encodeURIComponent(currentFile.name)}`);
+                    if (res.status === 401) {
+                        window.location.href = '/signin';
+                        return;
+                    }
+                    if (!res.ok) throw new Error('Failed to check status');
+                    const data = await res.json();
+
+                    if (data.resumable) {
+                        const resume = confirm(`An incomplete upload was found for ${currentFile.name}. Do you want to resume?`);
+                        if (resume) {
+                            uploadId = data.upload_id;
+                            await uploadChunks(data.uploaded_size);
+                            return;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Could not check for resumable upload:', error);
                 }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error: ' + error.message);
-                analyzeBtn.innerHTML = 'Analyze Document';
-                analyzeBtn.disabled = false;
+
+                // If not resuming, initiate a new upload
+                try {
+                    statusText.textContent = 'Initiating upload...';
+                    const initRes = await fetch('/uploads/initiate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            file_name: currentFile.name,
+                            file_size: currentFile.size,
+                            mime_type: currentFile.type
+                        })
+                    });
+                    if (initRes.status === 401) {
+                        window.location.href = '/signin';
+                        return;
+                    }
+                    if (!initRes.ok) throw new Error('Failed to initiate upload');
+                    const initData = await initRes.json();
+                    uploadId = initData.upload_id;
+                    await uploadChunks(0);
+                } catch (error) {
+                    console.error('Upload initiation failed:', error);
+                    statusText.textContent = `Error: ${error.message}`;
+                }
+
+            } else {
+                const uploadedSize = parseFloat(progressBar.style.width) / 100 * currentFile.size;
+                await uploadChunks(uploadedSize);
             }
         }
+
+        async function uploadChunks(startFrom) {
+            let start = startFrom;
+            statusText.textContent = 'Uploading...';
+
+            while (start < currentFile.size) {
+                if (isPaused) return;
+
+                const end = Math.min(start + CHUNK_SIZE, currentFile.size);
+                const chunk = currentFile.slice(start, end);
+                
+                try {
+                    const formData = new FormData();
+                    formData.append('chunk', chunk, currentFile.name);
+
+                    const res = await fetch(`/uploads/${uploadId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Range': `bytes ${start}-${end-1}/${currentFile.size}`
+                        },
+                        body: formData
+                    });
+
+                    if (res.status === 401) {
+                        window.location.href = '/signin';
+                        return;
+                    }
+                    if (!res.ok) {
+                       throw new Error(`Chunk upload failed with status ${res.status}`);
+                    }
+                    
+                    const data = await res.json();
+                    start = data.uploaded_size;
+
+                    const percentComplete = Math.round((start / currentFile.size) * 100);
+                    progressBar.style.width = `${percentComplete}%`;
+                    progressBar.textContent = `${percentComplete}%`;
+
+                } catch (error) {
+                    console.error('Chunk upload error:', error);
+                    statusText.textContent = `Error: ${error.message}. Retrying might be possible.`;
+                    isPaused = true;
+                    return;
+                }
+            }
+
+            if(start >= currentFile.size) {
+                 await finishUpload();
+            }
+        }
+
+        async function finishUpload() {
+            statusText.textContent = 'Finalizing upload...';
+            try {
+                const res = await fetch(`/uploads/${uploadId}/finish`, {
+                    method: 'POST'
+                });
+                if (res.status === 401) {
+                    window.location.href = '/signin';
+                    return;
+                }
+                if (!res.ok) throw new Error('Failed to finalize upload');
+                
+                statusText.textContent = 'Upload complete! Analysis started.';
+                uploadControls.style.display = 'none';
+                
+                const data = await res.json();
+                alert(data.message);
+                window.location.href = `/history`;
+
+            } catch (error) {
+                console.error('Finish upload error:', error);
+                statusText.textContent = `Error: ${error.message}`;
+            }
+        }
+
     </script>
 </body>
 </html>
