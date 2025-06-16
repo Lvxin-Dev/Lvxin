@@ -17,6 +17,12 @@ GOOGLE_CLIENT_SECRET = config("GOOGLE_CLIENT_SECRET", cast=str, default=None)
 WECHAT_CLIENT_ID = config("WECHAT_CLIENT_ID", cast=str, default=None)
 WECHAT_CLIENT_SECRET = config("WECHAT_CLIENT_SECRET", cast=str, default=None)
 
+# --- Redis Settings ---
+REDIS_HOST = config("REDIS_HOST", cast=str, default="localhost")
+REDIS_PORT = config("REDIS_PORT", cast=int, default=6379)
+REDIS_PASSWORD = config("REDIS_PASSWORD", cast=str, default=None)
+REDIS_DB = config("REDIS_DB", cast=int, default=0)
+SESSION_EXPIRE_MINUTES = config("SESSION_EXPIRE_MINUTES", cast=int, default=60 * 24 * 7) # 7 days
 
 # --- Authlib OAuth Registry ---
 oauth = OAuth(config)

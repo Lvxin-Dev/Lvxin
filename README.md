@@ -110,4 +110,19 @@ DB_USER=postgres
 DB_PASSWORD=1234
 DB_NAME=lvxin
 DB_PORT=5432
+
+# Redis credentials for session storage
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
+REDIS_DB=0
+SESSION_EXPIRE_MINUTES=10080 # 7 days
+```
+
+## Running Redis locally
+
+For local development, you can use Docker to easily run a Redis instance:
+
+```bash
+docker run -d -p 6379:6379 --name lvxin-redis redis
 ``` 

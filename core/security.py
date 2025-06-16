@@ -3,10 +3,12 @@ from uuid import UUID, uuid4
 from pydantic import BaseModel
 from passlib.context import CryptContext
 from fastapi import HTTPException, status, Depends
-from fastapi_sessions.backends.implementations import InMemoryBackend
+from fastapi_sessions.backends.session_backend import SessionBackend
 from fastapi_sessions.session_verifier import SessionVerifier
 from fastapi_sessions.frontends.implementations import SessionCookie, CookieParameters
 from core.config import SESSION_SECRET_KEY
+from core.database import get_redis_connection, get_db_connection, release_db_connection
+from core.redis_backend import RedisBackend
 
 # --- Password Hashing ---
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -25,8 +27,9 @@ class SessionData(BaseModel):
     username: str
     email: str
 
-# In-memory backend for session storage
-backend = InMemoryBackend[UUID, SessionData]()
+# Redis backend for session storage
+redis_client = get_redis_connection()
+backend: SessionBackend[UUID, SessionData] = RedisBackend(redis_client, session_model=SessionData)
 
 # Basic session verifier
 class BasicVerifier(SessionVerifier[UUID, SessionData]):
@@ -35,7 +38,7 @@ class BasicVerifier(SessionVerifier[UUID, SessionData]):
         *,
         identifier: str,
         auto_error: bool,
-        backend: InMemoryBackend[UUID, SessionData],
+        backend: SessionBackend[UUID, SessionData],
         auth_http_exception: HTTPException,
     ):
         self._identifier = identifier
@@ -60,8 +63,16 @@ class BasicVerifier(SessionVerifier[UUID, SessionData]):
         return self._auth_http_exception
 
     def verify_session(self, model: SessionData) -> bool:
-        """Verify the session data. For this basic verifier, we trust any valid model."""
-        return True
+        """Verify the session data by checking if the user exists in the database."""
+        conn = get_db_connection()
+        try:
+            cur = conn.cursor()
+            cur.execute("SELECT 1 FROM users WHERE user_id = %s", (model.user_id,))
+            user_exists = cur.fetchone() is not None
+            cur.close()
+            return user_exists
+        finally:
+            release_db_connection(conn)
 
 # Exception for unauthorized access
 auth_exception = HTTPException(
@@ -77,14 +88,19 @@ verifier = BasicVerifier(
 )
 
 # Cookie parameters for the session
-cookie_params = CookieParameters()
+# In a production environment, you should set secure=True
+cookie_params = CookieParameters(
+    secure=True,      # Should be True in production (requires HTTPS)
+    httponly=True,
+    samesite="lax",
+)
 
 # Session cookie manager
 cookie = SessionCookie(
     cookie_name="session_id",
     identifier="general_verifier",
     auto_error=True,
-    secret_key=SESSION_SECRET_KEY,  # Use secret key from config
+    secret_key=SESSION_SECRET_KEY,
     cookie_params=cookie_params,
 )
 
