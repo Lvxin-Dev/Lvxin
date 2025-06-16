@@ -50,7 +50,7 @@ app = FastAPI(title="Lvxin API")
 
 # --- Middleware ---
 # Important: The secret key should be loaded from a secure source, e.g., environment variables
-app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET_KEY", "your-super-secret-key"))
+# app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET_KEY", "your-super-secret-key"))
 
 # --- Routers ---
 app.include_router(auth.router)

@@ -3,10 +3,12 @@ from uuid import UUID, uuid4
 from pydantic import BaseModel
 from passlib.context import CryptContext
 from fastapi import HTTPException, status, Depends
-from fastapi_sessions.backends.implementations import InMemoryBackend
+from fastapi_sessions.backends.implementations import RedisBackend
 from fastapi_sessions.session_verifier import SessionVerifier
 from fastapi_sessions.frontends.implementations import SessionCookie, CookieParameters
-from core.config import SESSION_SECRET_KEY
+from core.config import SESSION_SECRET_KEY, REDIS_URL
+from .redis_backend import RedisBackend
+from users.models import get_user
 
 # --- Password Hashing ---
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -25,8 +27,8 @@ class SessionData(BaseModel):
     username: str
     email: str
 
-# In-memory backend for session storage
-backend = InMemoryBackend[UUID, SessionData]()
+# Redis backend for session storage
+backend = RedisBackend(REDIS_URL)
 
 # Basic session verifier
 class BasicVerifier(SessionVerifier[UUID, SessionData]):
@@ -35,7 +37,7 @@ class BasicVerifier(SessionVerifier[UUID, SessionData]):
         *,
         identifier: str,
         auto_error: bool,
-        backend: InMemoryBackend[UUID, SessionData],
+        backend: RedisBackend,
         auth_http_exception: HTTPException,
     ):
         self._identifier = identifier
@@ -61,7 +63,8 @@ class BasicVerifier(SessionVerifier[UUID, SessionData]):
 
     def verify_session(self, model: SessionData) -> bool:
         """Verify the session data. For this basic verifier, we trust any valid model."""
-        return True
+        user = get_user(model.user_id)
+        return user is not None
 
 # Exception for unauthorized access
 auth_exception = HTTPException(
