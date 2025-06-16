@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LVXIN - Upload Contract</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../static/CSS/stylee.css">
+    <style>
+        /* Main Content */
+        
+        .main-content {
+            margin-left: 240px;
+            padding: 1rem 2rem;
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .upload-container {
+            width: 50%;
+            max-width: 800px;
+        }
+        
+        .logo-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .main-logo {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+        
+        .sub-logo {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+        
+        .upload-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 3rem;
+            box-shadow: 0 10px 30px rgba(74, 144, 226, 0.15);
+        }
+        
+        .drag-drop-area {
+            border: 2px dashed var(--primary);
+            border-radius: 15px;
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            background: rgba(74, 144, 226, 0.05);
+        }
+        
+        .drag-drop-area:hover,
+        .drag-drop-area.dragover {
+            background: rgba(74, 144, 226, 0.1);
+            border-color: var(--secondary);
+            transform: translateY(-3px);
+        }
+        
+        .upload-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .upload-instructions {
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .file-requirements {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+        
+        .contract-type-select {
+            width: 100%;
+            padding: 1rem;
+            margin: 2rem 0;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+        
+        .contract-type-select:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 8px rgba(108, 92, 231, 0.2);
+        }
+        
+        .analyze-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+        }
+        
+        .selected-file {
+            margin-top: 1rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        .main-content {
+            margin-left: 240px;
+            padding: 4rem 2rem;
+            flex: 1;
+            margin-top: 80px;
+            /* Creates space below the navbar */
+        }
+        /* Responsive Design */
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 2rem 1rem;
+            }
+            .navbar {
+                padding: 1rem 2rem;
+            }
+            .nav-links {
+                display: none;
+            }
+        }
+        /* Profile Component Styles */
+        .profile-component {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            text-decoration: none;
+            transition: all var(--transition-speed) ease;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--primary);
+        }
+        
+        .profile-component:hover {
+            background: rgba(74, 144, 226, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.1);
+        }
+        
+        .profile-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .profile-name {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        body.dark-mode .profile-name {
+            color: var(--dark-text);
+        }
+        
+        /* Responsive Profile */
+        @media (max-width: 768px) {
+            .profile-component {
+                padding: 0.5rem;
+                gap: 0.5rem;
+            }
+            .profile-name {
+                display: none;
+            }
+        }
+
+        .progress-container {
+            margin-top: 1.5rem;
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 20px;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            text-align: center;
+            line-height: 20px;
+            color: white;
+            font-weight: 600;
+            transition: width 0.4s ease;
+        }
+
+        .status-text {
+            margin-top: 0.5rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-align: center;
+            display: none;
+        }
+
+        .upload-controls {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            display: none;
+        }
+
+        .control-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .pause-btn {
+            background-color: var(--warning);
+            color: white;
+        }
+
+        .resume-btn {
+            background-color: var(--success);
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="logo">
+            <a href="welcome_page">
+                <img src="../static/images/logo.jpg" alt="绿信标志">
+            </a>
+        </div>
+
+        <div class="nav-links">
+            <a href="subscriptions" class="en-content">定价</a>
+            <a href="aboutus" class="en-content">关于我们</a>
+            <a href="helpcenter" class="en-content">帮助中心</a>
+        </div>
+        <div class="actions">
+            <button id="themeToggle" class="icon-btn">
+                <i class="fas fa-moon"></i>
+            </button>
+            <!-- Elfsight 网站翻译器 | 无标题网站翻译器 -->
+            <script src="https://static.elfsight.com/platform/platform.js" async></script>
+            <div class="elfsight-app-fce75b10-069c-41d5-bca0-09c33e812801" data-elfsight-app-lazy></div>
+  
+
+            <a href="profile" class="profile-component">
+                <img src="../static/images/profile.jpeg" class="profile-image" alt="个人资料图片">
+                <span class="profile-name">{{name}}</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- 侧边栏 -->
+    <nav class="sidebar">
+        <div class="nav-section">
+            <div class="nav-title">团队数据库</div>
+            <a href="mydash" class="nav-item"> <i class="fas fa-bar-chart"></i>上传合同</a>
+            <a href="chat" class="nav-item"> <i class="fas fa-comments"></i>聊天</a>
+            <a href="upload_contract" class="nav-item"> <i class="fas fa-file-upload"></i> 上传合同 </a>
+            <a href="history" class="nav-item"> <i class="fas fa-history"></i> 分析历史 </a>
+            <a href="analysis" class="nav-item active"> <i class="fas fa-folder-open"></i> 文档分析 </a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-title">账户</div>
+            <a href="profile" class="nav-item"> <i class="fas fa-user"></i> 用户资料 </a>
+            <a href="subscriptions" class="nav-item"> <i class="fas fa-star"></i> 订阅 </a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-title">支持</div>
+            <a href="contactus" class="nav-item"> <i class="fas fa-envelope"></i> 联系我们 </a>
+            <a href="helpcenter" class="nav-item"> <i class="fas fa-question-circle"></i> 常见问题 </a>
+            <a href="aboutus" class="nav-item"> <i class="fas fa-info-circle"></i> 关于我们 </a>
+            <a href="whats-new" class="nav-item "><i class="fas fa-bullhorn"></i> 有什么新的 </a>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <div class="upload-container">
+            <div class="logo-header">
+                <h1 class="main-logo">智能合同分析</h1>
+                <p class="sub-logo">上传您的合同，获得AI驱动的即时见解</p>
+            </div>
+            <div class="upload-card">
+                <form id="uploadForm">
+                    <div class="drag-drop-area" id="dragDropArea">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <p class="upload-instructions">拖放文件到此处或 <strong>点击上传</strong></p>
+                        <input type="file" id="fileInput" hidden>
+                    </div>
+                    <p class="file-requirements">(支持的文件类型: PDF, DOC, DOCX)</p>
+                    <div id="selectedFile" class="selected-file"></div>
+
+                    <div id="progressContainer" class="progress-container">
+                        <div id="progressBar" class="progress-bar">0%</div>
+                    </div>
+                    <div id="statusText" class="status-text"></div>
+                    <div id="uploadControls" class="upload-controls">
+                        <button type="button" id="pauseBtn" class="control-btn pause-btn">暂停</button>
+                        <button type="button" id="resumeBtn" class="control-btn resume-btn">继续</button>
+                        <button type="button" id="cancelBtn" class="control-btn cancel-btn">取消</button>
+                    </div>
+
+                    <select class="contract-type-select" name="contract_type" required>
+                        <option value="" disabled selected>选择合同类型</option>
+                        <option value="nda">保密协议</option>
+                        <option value="employment">劳动合同</option>
+                        <option value="lease">租赁协议</option>
+                        <option value="service">服务协议</option>
+                    </select>
+                    <button type="submit" class="analyze-btn">分析合同</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script src="../static/JS/upload.js"></script>
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        let isDarkMode = localStorage.getItem('darkMode') === 'true';
+
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            document.body.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+            themeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            localStorage.setItem('darkMode', isDarkMode);
+        }
+
+        themeToggle.addEventListener('click', toggleTheme);
+        document.body.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+        themeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    </script>
+</body>
+
+</html>

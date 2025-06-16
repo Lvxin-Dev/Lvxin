@@ -1,0 +1,111 @@
+import os
+import json
+import shutil
+import logging
+from datetime import datetime
+from typing import Optional
+from core.security import SessionData
+from core.database import get_db_connection, release_db_connection
+
+logger = logging.getLogger(__name__)
+
+USERS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "users")
+if not os.path.exists(USERS_DIR):
+    os.makedirs(USERS_DIR)
+
+def create_user_folder(user_id: str, username: str) -> str:
+    """Create a folder for the user with their ID and username"""
+    folder_name = f"{user_id}_{username}"
+    user_folder = os.path.join(USERS_DIR, folder_name)
+    
+    if not os.path.exists(user_folder):
+        os.makedirs(user_folder)
+    
+    return user_folder
+
+def delete_user_folder(user_id: str, username: str) -> bool:
+    """Delete the folder for the user with their ID and username"""
+    folder_name = f"{user_id}_{username}"
+    user_folder = os.path.join(USERS_DIR, folder_name)
+    
+    if os.path.exists(user_folder):
+        try:
+            shutil.rmtree(user_folder)
+            return True
+        except Exception as e:
+            print(f"Error deleting user folder: {e}")
+            return False
+    else:
+        print(f"User folder {user_folder} does not exist")
+        return False
+
+def save_user_data(user_id: str, username: str, full_name: str, email: str, file_url: Optional[str] = None, filename: Optional[str] = None, api_url: Optional[str] = None):
+    """Save user data to their own JSON file"""
+    user_folder = create_user_folder(user_id, username)
+    file_name = f"{user_id}_{username}.json"
+    file_path = os.path.join(user_folder, file_name)
+    
+    user_data = {
+        "user_id": user_id,
+        "username": username,
+        "full_name": full_name,
+        "email": email,
+        "file_url": file_url,
+        "file_name":filename,
+        "api_url":api_url,
+        "created_at": datetime.now().isoformat(),
+        "last_login": datetime.now().isoformat()
+    }
+    
+    with open(file_path, 'w') as f:
+        json.dump(user_data, f, indent=4)
+    
+    return user_data
+
+def reach_json(session_data: SessionData):
+    user_id = session_data.user_id
+    username = session_data.username
+    
+    user_folder = os.path.join(USERS_DIR, f"{user_id}_{username}")
+    file_name = f"{user_id}_{username}.json"
+    file_path = os.path.join(user_folder, file_name)
+    
+    if not os.path.exists(file_path):
+        logger.warning(f"User data file not found for user {user_id}. Recreating it.")
+        conn = None
+        try:
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute("SELECT full_name, email FROM users WHERE user_id = %s", (user_id,))
+            user_db_data = cur.fetchone()
+            if user_db_data:
+                full_name, email = user_db_data
+                return save_user_data(user_id, username, full_name, email)
+            else:
+                logger.error(f"Could not find user {user_id} in database to recreate data file.")
+                return { "user_id": user_id, "username": username, "full_name": "Unknown", "email": session_data.email }
+        except Exception as e:
+            logger.error(f"Database error while recreating user file for {user_id}: {e}")
+            return { "user_id": user_id, "username": username, "full_name": "Unknown", "email": session_data.email }
+        finally:
+            if conn:
+                release_db_connection(conn)
+
+    with open(file_path, 'r') as f:
+        user_data = json.load(f)
+    return user_data
+
+def update_user_login_time(user_id: str, username: str):
+    """Update the user's last login time"""
+    user_folder = os.path.join(USERS_DIR, f"{user_id}_{username}")
+    file_name = f"{user_id}_{username}.json"
+    file_path = os.path.join(user_folder, file_name)
+    
+    if os.path.exists(file_path):
+        with open(file_path, 'r') as f:
+            user_data = json.load(f)
+        
+        user_data["last_login"] = datetime.now().isoformat()
+        
+        with open(file_path, 'w') as f:
+            json.dump(user_data, f, indent=4) 
