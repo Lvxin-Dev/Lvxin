@@ -1,28 +1,32 @@
 # Lvxin Contract Analysis
 
-This is a web application built with FastAPI for uploading, analyzing, and managing contracts.
+This is a web-based platform for uploading and analyzing legal contracts. It features a robust, resumable file upload system built with FastAPI on the backend and modern JavaScript on the frontend.
 
 ## Features
 
-- User authentication (including Google and WeChat logins)
-- File upload (PDF, DOC, DOCX)
-- Contract analysis
-- User dashboard to view analysis history and results
+- **Resumable File Uploads**: Pause and resume large file uploads, even after a network interruption or browser crash.
+- **Chunked Uploading**: Files are uploaded in small, manageable chunks to improve reliability.
+- **Backend Analysis Pipeline**: Once a file is uploaded, it is sent to a (mocked) third-party service for analysis.
+- **User-Specific Storage**: Uploaded files are stored securely in user-specific directories.
+- **Database Tracking**: Upload sessions are tracked in a PostgreSQL database for persistence.
+- **Automated Cleanup**: A cleanup script is provided to remove stale or failed uploads.
 
-## Project Structure
+## Tech Stack
 
-- `main.py`: The main FastAPI application entry point.
-- `routers/`: Contains API routers for different parts of the application (e.g., `auth.py`).
-- `core/`: Core components like database connections (`database.py`) and security (`security.py`).
-- `services/`: Business logic for user management, file processing, etc.
-- `templates/`: Jinja2 templates for the frontend.
-- `static/`: Static assets (CSS, JS, images).
-- `users/`: Directory where user-specific files are stored.
-- `uploads/`: Temporary directory for file uploads.
+- **Backend**: FastAPI, Python 3.12
+- **Database**: PostgreSQL
+- **Frontend**: Vanilla JavaScript (ES6+), HTML5, CSS3
+- **Testing**: Pytest, unittest.mock
 
-## Setup Instructions
+## Getting Started
 
-### Backend
+### Prerequisites
+
+- Python 3.12+
+- PostgreSQL
+- `pip` for package management
+
+### Installation
 
 1.  **Clone the repository:**
     ```bash
@@ -43,7 +47,7 @@ This is a web application built with FastAPI for uploading, analyzing, and manag
     source venv/bin/activate
     ```
 
-3.  **Install dependencies:**
+3.  **Install the dependencies:**
     ```bash
     pip install -r requirements.txt
     ```
@@ -71,18 +75,17 @@ The frontend is built with Jinja2 templates and is served directly by the FastAP
 Run the following command from the root of the project:
 
 ```bash
-uvicorn main:app --host 127.0.0.1 --port 8000
+export PYTHONPATH=$(pwd)/venv/lib/python3.12/site-packages; uvicorn main:app --host 127.0.0.1 --port 8000
 ```
 
-The application will be available at `http://127.0.0.1:8000`.
+**Note**: You will need to provide valid API credentials as environment variables (`access_id`, `sec_key`, `work_id`) for the analysis service to work.
 
-### **Troubleshooting**
+#### Development (Mock) Mode
 
-If you encounter a `ModuleNotFoundError` for a package that is listed in `requirements.txt` and appears to be installed (e.g., `email-validator`), your Python interpreter might not be looking in the virtual environment's `site-packages` directory. You can force it to by setting the `PYTHONPATH` variable before running the application:
+For frontend development and testing without making real API calls, you can run the application in mock mode. This mode simulates the API responses, allowing you to test the full upload flow without credentials or cost.
 
 ```bash
-export PYTHONPATH=$(pwd)/venv/lib/python3.12/site-packages
-uvicorn main:app --host 127.0.0.1 --port 8000
+export APP_MODE=development; uvicorn main:app --host 127.0.0.1 --port 8000
 ```
 *Note: Adjust the python version in the path if you are using a different one.*
 

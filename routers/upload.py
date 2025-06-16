@@ -164,7 +164,7 @@ async def upload_chunk(
     if not chunk_offset:
          raise HTTPException(status_code=400, detail="Content-Range header is required.")
     
-    start_byte = int(chunk_offset.split(" ")[1].split("-")[0])
+    start_byte = int(float(chunk_offset.split(" ")[1].split("-")[0]))
 
 
     temp_chunk_path = os.path.join(storage_path, f"chunk_{start_byte}")

@@ -433,6 +433,16 @@ body {
     justify-content: center;
 }
 
+.resume-btn {
+    background-color: var(--success);
+    color: white;
+}
+
+.cancel-btn {
+    background-color: var(--danger);
+    color: white;
+}
+
 
 /* Upload Prompt */
 

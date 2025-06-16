@@ -10,8 +10,36 @@ from results import final_results
 
 logger = logging.getLogger(__name__)
 
+# --- Mock Functions for Development ---
+
+def _mock_oss_upload(f_loc: str, f_name: str) -> str:
+    """A mock version of oss_upload for development mode."""
+    logger.info(f"--- MOCK MODE: Simulating OSS upload for {f_name} ---")
+    mock_url = f"https://mock-bucket.oss-cn-hangzhou.aliyuncs.com/{f_name}"
+    logger.info(f"--- MOCK MODE: Returning mock URL: {mock_url} ---")
+    return mock_url
+
+def _mock_api_dep(ur: str, file_name: str, output_filename: str):
+    """A mock version of api_dep for development mode."""
+    logger.info(f"--- MOCK MODE: Simulating analysis pipeline for {file_name} ---")
+    # Create a dummy output file to simulate a real analysis result
+    mock_results = {
+        "summary": "This is a mock analysis result.",
+        "clauses": [{"type": "Confidentiality", "content": "Mock clause content."}]
+    }
+    with open(output_filename, 'w', encoding='utf-8') as f:
+        json.dump(mock_results, f, ensure_ascii=False, indent=4)
+    logger.info(f"--- MOCK MODE: Mock analysis complete. Results in {output_filename} ---")
+    return mock_results
+
+# --- Original Functions with Mock Hook ---
+
 def oss_upload(f_loc: str, f_name: str) -> str:
     """Uploads a file to Alibaba Cloud OSS and returns the signed URL."""
+    # If in development mode, use the mock function instead
+    if os.getenv("APP_MODE") == "development":
+        return _mock_oss_upload(f_loc, f_name)
+
     # Set environment variables programmatically
     os.environ['OSS_ACCESS_KEY_ID'] = os.getenv("access_id")
     os.environ['OSS_ACCESS_KEY_SECRET'] = os.getenv("sec_key")
@@ -31,6 +59,10 @@ def oss_upload(f_loc: str, f_name: str) -> str:
 
 def api_dep(ur: str, file_name: str, output_filename: str):
     """Handles the contract analysis API workflow."""
+    # If in development mode, use the mock function instead
+    if os.getenv("APP_MODE") == "development":
+        return _mock_api_dep(ur, file_name, output_filename)
+
     logger.info(f"Uploading for analysis: {file_name} from {ur}")
     
     access_key_id = os.getenv("access_id")

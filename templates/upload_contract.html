@@ -9,8 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../static/CSS/stylee.css">
     <style>
-        
-        
         /* Main Content */
         
         .main-content {
@@ -333,6 +331,7 @@
                     <div id="uploadControls" class="upload-controls">
                         <button type="button" id="pauseBtn" class="control-btn pause-btn">暂停</button>
                         <button type="button" id="resumeBtn" class="control-btn resume-btn">继续</button>
+                        <button type="button" id="cancelBtn" class="control-btn cancel-btn">取消</button>
                     </div>
 
                     <select class="contract-type-select" name="contract_type" required>
@@ -348,6 +347,7 @@
         </div>
     </main>
 
+    <script src="../static/JS/upload.js"></script>
     <script>
         // Theme Toggle
         const themeToggle = document.getElementById('themeToggle');
@@ -363,221 +363,6 @@
         themeToggle.addEventListener('click', toggleTheme);
         document.body.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
         themeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-
-        // Resumable Upload Logic
-        const uploadForm = document.getElementById('uploadForm');
-        const fileInput = document.getElementById('fileInput');
-        const dragDropArea = document.getElementById('dragDropArea');
-        const selectedFileDisplay = document.getElementById('selectedFile');
-
-        const progressContainer = document.getElementById('progressContainer');
-        const progressBar = document.getElementById('progressBar');
-        const statusText = document.getElementById('statusText');
-        const uploadControls = document.getElementById('uploadControls');
-        const pauseBtn = document.getElementById('pauseBtn');
-        const resumeBtn = document.getElementById('resumeBtn');
-
-        let currentFile = null;
-        let uploadId = null;
-        let isPaused = false;
-        const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
-
-        dragDropArea.addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', (e) => handleFileSelect(e.target.files[0]));
-
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dragDropArea.addEventListener(eventName, preventDefaults, false);
-        });
-
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-
-        dragDropArea.addEventListener('dragenter', () => dragDropArea.classList.add('dragover'));
-        dragDropArea.addEventListener('dragleave', () => dragDropArea.classList.remove('dragover'));
-        dragDropArea.addEventListener('drop', (e) => {
-            dragDropArea.classList.remove('dragover');
-            handleFileSelect(e.dataTransfer.files[0]);
-        });
-
-        function handleFileSelect(file) {
-            if (!file) return;
-            currentFile = file;
-            selectedFileDisplay.textContent = `Selected File: ${file.name}`;
-            resetUploadState();
-        }
-
-        function resetUploadState() {
-            uploadId = null;
-            isPaused = false;
-            progressContainer.style.display = 'none';
-            progressBar.style.width = '0%';
-            progressBar.textContent = '0%';
-            statusText.style.display = 'none';
-            statusText.textContent = '';
-            uploadControls.style.display = 'none';
-        }
-        
-        uploadForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!currentFile) {
-                alert("Please select a file to upload.");
-                return;
-            }
-            isPaused = false;
-            await startOrResumeUpload();
-        });
-
-        pauseBtn.addEventListener('click', () => {
-            isPaused = true;
-            statusText.textContent = 'Paused';
-        });
-
-        resumeBtn.addEventListener('click', async () => {
-            isPaused = false;
-            statusText.textContent = 'Resuming...';
-            await startOrResumeUpload();
-        });
-
-        async function startOrResumeUpload() {
-            statusText.style.display = 'block';
-            progressContainer.style.display = 'block';
-            uploadControls.style.display = 'flex';
-
-            if (!uploadId) {
-                // Check if a resumable session exists
-                try {
-                    statusText.textContent = 'Checking for existing uploads...';
-                    const res = await fetch(`/uploads/status?file_name=${encodeURIComponent(currentFile.name)}`);
-                    if (res.status === 401) {
-                        window.location.href = '/signin';
-                        return;
-                    }
-                    if (!res.ok) throw new Error('Failed to check status');
-                    const data = await res.json();
-
-                    if (data.resumable) {
-                        const resume = confirm(`An incomplete upload was found for ${currentFile.name}. Do you want to resume?`);
-                        if (resume) {
-                            uploadId = data.upload_id;
-                            await uploadChunks(data.uploaded_size);
-                            return;
-                        }
-                    }
-                } catch (error) {
-                    console.error('Could not check for resumable upload:', error);
-                    // Continue with new upload if status check fails
-                }
-                
-                // If not resuming, initiate a new upload
-                try {
-                    statusText.textContent = 'Initiating upload...';
-                    const initRes = await fetch('/uploads/initiate', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            file_name: currentFile.name,
-                            file_size: currentFile.size,
-                            mime_type: currentFile.type
-                        })
-                    });
-                    if (initRes.status === 401) {
-                        window.location.href = '/signin';
-                        return;
-                    }
-                    if (!initRes.ok) throw new Error('Failed to initiate upload');
-                    const initData = await initRes.json();
-                    uploadId = initData.upload_id;
-                    await uploadChunks(0);
-                } catch (error) {
-                    console.error('Upload initiation failed:', error);
-                    statusText.textContent = `Error: ${error.message}`;
-                }
-
-            } else {
-                 // It's a resume from a pause, not a page reload
-                const uploadedSize = parseFloat(progressBar.style.width) / 100 * currentFile.size;
-                await uploadChunks(uploadedSize);
-            }
-        }
-
-        async function uploadChunks(startFrom) {
-            let start = startFrom;
-            statusText.textContent = 'Uploading...';
-
-            while (start < currentFile.size) {
-                if (isPaused) return;
-
-                const end = Math.min(start + CHUNK_SIZE, currentFile.size);
-                const chunk = currentFile.slice(start, end);
-                
-                try {
-                    const formData = new FormData();
-                    formData.append('chunk', chunk, currentFile.name);
-
-                    const res = await fetch(`/uploads/${uploadId}`, {
-                        method: 'PATCH',
-                        headers: {
-                            'Content-Range': `bytes ${start}-${end-1}/${currentFile.size}`
-                        },
-                        body: formData
-                    });
-
-                    if (res.status === 401) {
-                        window.location.href = '/signin';
-                        return;
-                    }
-                    if (!res.ok) {
-                       throw new Error(`Chunk upload failed with status ${res.status}`);
-                    }
-                    
-                    const data = await res.json();
-                    start = data.uploaded_size;
-
-                    const percentComplete = Math.round((start / currentFile.size) * 100);
-                    progressBar.style.width = `${percentComplete}%`;
-                    progressBar.textContent = `${percentComplete}%`;
-
-                } catch (error) {
-                    console.error('Chunk upload error:', error);
-                    statusText.textContent = `Error: ${error.message}. Retrying might be possible.`;
-                    isPaused = true;
-                    return;
-                }
-            }
-
-            if(start >= currentFile.size) {
-                 await finishUpload();
-            }
-        }
-
-        async function finishUpload() {
-            statusText.textContent = 'Finalizing upload...';
-            try {
-                const res = await fetch(`/uploads/${uploadId}/finish`, {
-                    method: 'POST'
-                });
-                if (res.status === 401) {
-                    window.location.href = '/signin';
-                    return;
-                }
-                if (!res.ok) throw new Error('Failed to finalize upload');
-                
-                statusText.textContent = 'Upload complete! Analysis started.';
-                uploadControls.style.display = 'none';
-                
-                const data = await res.json();
-                // Redirect or show success message
-                alert(data.message);
-                window.location.href = `/history`;
-
-
-            } catch (error) {
-                console.error('Finish upload error:', error);
-                statusText.textContent = `Error: ${error.message}`;
-            }
-        }
     </script>
 </body>
 
