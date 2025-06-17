@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LVXIN Legal - Users Dashboard</title>
+    <title data-i18n="title">LVXIN Legal - Users Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../static/CSS/stylee.css">
@@ -68,6 +68,14 @@
                 grid-template-columns: 1fr;
             }
         }
+        .language-selector {
+            background-color: var(--card-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            padding: 0.3rem 0.5rem;
+            margin-right: 0.5rem;
+        }
     </style>
 </head>
 <body>
@@ -79,11 +87,15 @@
             </a>
         </div>
         <div class="nav-links">
-            <a href="subscriptions" class="en-content">定价</a>
-            <a href="aboutus" class="en-content">关于我们</a>
-            <a href="helpcenter" class="en-content">帮助中心</a>
+            <a href="subscriptions" data-i18n="pricing">定价</a>
+            <a href="aboutus" data-i18n="about_us">关于我们</a>
+            <a href="helpcenter" data-i18n="help_center">帮助中心</a>
         </div>
         <div class="actions">
+            <select id="language-selector" class="language-selector" aria-label="Language selector">
+                <option value="en">English</option>
+                <option value="zh">中文</option>
+            </select>
             <button id="themeToggle" class="icon-btn">
                 <i class="fas fa-moon"></i>
             </button>
@@ -98,50 +110,50 @@
     <!-- Sidebar -->
     <nav class="sidebar">
         <div class="nav-section">
-            <div class="nav-title">团队数据库</div>
-            <a href="mydash" class="nav-item active" > <i class="fas fa-bar-chart"></i> 上传合同 </a>
-            <a href="upload_contract" class="nav-item"> <i class="fas fa-file-upload"></i> 上传合同 </a>
-            <a href="history" class="nav-item"> <i class="fas fa-history"></i> 分析历史 </a>
-            <a href="analysis" class="nav-item"> <i class="fas fa-folder-open"></i> 文档分析 </a>
+            <div class="nav-title" data-i18n="team_database">团队数据库</div>
+            <a href="mydash" class="nav-item active" data-i18n="dashboard"> <i class="fas fa-bar-chart"></i> 上传合同 </a>
+            <a href="upload_contract" class="nav-item" data-i18n="upload_contract"> <i class="fas fa-file-upload"></i> 上传合同 </a>
+            <a href="history" class="nav-item" data-i18n="analysis_history"> <i class="fas fa-history"></i> 分析历史 </a>
+            <a href="analysis" class="nav-item" data-i18n="document_analysis"> <i class="fas fa-folder-open"></i> 文档分析 </a>
         </div>
         <div class="nav-section">
-            <div class="nav-title">账户</div>
-            <a href="profile" class="nav-item"> <i class="fas fa-user"></i> 用户资料 </a>
-            <a href="subscriptions" class="nav-item"> <i class="fas fa-star"></i> 订阅 </a>
+            <div class="nav-title" data-i18n="account">账户</div>
+            <a href="profile" class="nav-item" data-i18n="user_profile"> <i class="fas fa-user"></i> 用户资料 </a>
+            <a href="subscriptions" class="nav-item" data-i18n="subscriptions"> <i class="fas fa-star"></i> 订阅 </a>
         </div>
         <div class="nav-section">
-            <div class="nav-title">支持</div>
-            <a href="contactus" class="nav-item"> <i class="fas fa-envelope"></i> 联系我们 </a>
-            <a href="helpcenter" class="nav-item"> <i class="fas fa-question-circle"></i> 常见问题 </a>
-            <a href="aboutus" class="nav-item"> <i class="fas fa-info-circle"></i> 关于我们 </a>
-            <a href="whats-new" class="nav-item "><i class="fas fa-info-circle"></i>有什么新的</a>
+            <div class="nav-title" data-i18n="support">支持</div>
+            <a href="contactus" class="nav-item" data-i18n="contact_us"> <i class="fas fa-envelope"></i> 联系我们 </a>
+            <a href="helpcenter" class="nav-item" data-i18n="faq"> <i class="fas fa-question-circle"></i> 常见问题 </a>
+            <a href="aboutus" class="nav-item" data-i18n="about_us"> <i class="fas fa-info-circle"></i> 关于我们 </a>
+            <a href="whats-new" class="nav-item " data-i18n="whats_new"><i class="fas fa-info-circle"></i>有什么新的</a>
         </div>
     </nav>
     <!-- Main Content -->
     <main class="main-content">
         <div class="dashboard-header">
-            <h1>用户仪表盘</h1>
-            <p>您的合同分析活动一览</p>
+            <h1 data-i18n="user_dashboard_title">用户仪表盘</h1>
+            <p data-i18n="activity_overview">您的合同分析活动一览</p>
         </div>
         <div class="dashboard-metrics">
             <div class="metric-card">
                 <div class="metric-icon"><i class="fas fa-file-contract"></i></div>
-                <div class="metric-title">上传合同数</div>
+                <div class="metric-title" data-i18n="contracts_uploaded">上传合同数</div>
                 <div class="metric-value" id="contractsCount">{{contract_number}}</div>
             </div>
             <div class="metric-card">
                 <div class="metric-icon"><i class="fas fa-file-alt"></i></div>
-                <div class="metric-title">上传页面数</div>
+                <div class="metric-title" data-i18n="pages_uploaded">上传页面数</div>
                 <div class="metric-value" id="pagesCount">{{contract_pages}}</div>
             </div>
             <div class="metric-card">
                 <div class="metric-icon"><i class="fas fa-font"></i></div>
-                <div class="metric-title">上传字数</div>
+                <div class="metric-title" data-i18n="characters_uploaded">上传字数</div>
                 <div class="metric-value" id="wordsCount">{{contract_characters}}</div>
             </div>
             <div class="metric-card">
                 <div class="metric-icon"><i class="fas fa-yen-sign"></i></div>
-                <div class="metric-title">应付金额 (¥)</div>
+                <div class="metric-title" data-i18n="payment_due">应付金额 (¥)</div>
                 <div class="metric-value" id="paymentAmount">¥{{contract_cost}}</div>
             </div>
         </div>
@@ -210,5 +222,9 @@
         document.body.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
         themeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
     </script>
+    <script src="https://unpkg.com/i18next/i18next.min.js"></script>
+    <script src="https://unpkg.com/i18next-http-backend/i18nextHttpBackend.min.js"></script>
+    <script src="https://unpkg.com/i18next-browser-languagedetector/i18nextBrowserLanguageDetector.min.js"></script>
+    <script src="../static/JS/i18n.js"></script>
 </body>
 </html>
