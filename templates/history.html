@@ -4,15 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="history_title">Analysis History & Document Library</title>
+    <title data-i18n="page_title">Analysis History & Document Library</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../static/CSS/stylee.css">
-    <script src="https://cdn.jsdelivr.net/npm/i18next@21.6.10/i18next.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/i18next-http-backend@1.3.2/i18nextHttpBackend.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/i18next-browser-languagedetector@6.1.3/i18nextBrowserLanguageDetector.min.js"></script>
-    <script src="../static/JS/i18n.js"></script>
     <style>
        
         
@@ -211,17 +207,17 @@
     <nav class="navbar">
         <div class="logo">
             <a href="welcome_page">
-                <img src="../static/images/logo.jpg" alt="绿信标志">
+                <img src="../static/images/logo.jpg" alt="绿信标志" data-i18n="[alt]nav.logo_alt">
             </a>
         </div>
 
         <div class="nav-links">
-            <a href="subscriptions" data-i18n="pricing">定价</a>
-            <a href="aboutus" data-i18n="about_us">关于我们</a>
-            <a href="helpcenter" data-i18n="help_center">帮助中心</a>
+            <a href="subscriptions" class="en-content" data-i18n="nav.pricing">定价</a>
+            <a href="aboutus" class="en-content" data-i18n="nav.about_us">关于我们</a>
+            <a href="helpcenter" class="en-content" data-i18n="nav.help_center">帮助中心</a>
         </div>
         <div class="actions">
-            <select id="language-selector" class="form-control" style="background: var(--card-bg); color: var(--text-primary); border-color: var(--primary);">
+            <select id="language-selector" class="language-selector" aria-label="Language selector" style="background-color: var(--card-bg); color: var(--text-primary); border: 1px solid var(--border); border-radius: 5px; padding: 0.3rem 0.5rem; margin-right: 0.5rem;">
                 <option value="en">English</option>
                 <option value="zh">中文</option>
             </select>
@@ -233,7 +229,7 @@
             <div class="elfsight-app-fce75b10-069c-41d5-bca0-09c33e812801" data-elfsight-app-lazy></div>
 
             <a href="profile" class="profile-component">
-                <img src="../static/images/profile.jpeg" class="profile-image" alt="个人资料图片">
+                <img src="../static/images/profile.jpeg" class="profile-image" alt="个人资料图片" data-i18n="[alt]nav.profile_alt">
                 <span class="profile-name">{{name}}</span>
             </a>
         </div>
@@ -242,23 +238,23 @@
     <!-- 侧边栏 -->
     <nav class="sidebar">
         <div class="nav-section">
-            <div class="nav-title" data-i18n="team_database">团队数据库</div>
-            <a href="mydash" class="nav-item"> <i class="fas fa-bar-chart"></i> <span data-i18n="dashboard">上传合同</span> </a>
-            <a href="upload_contract" class="nav-item"> <i class="fas fa-file-upload"></i> <span data-i18n="upload_contract">上传合同</span> </a>
-            <a href="history" class="nav-item active"> <i class="fas fa-history"></i> <span data-i18n="analysis_history">分析历史</span> </a>
-            <a href="analysis" class="nav-item"> <i class="fas fa-folder-open"></i> <span data-i18n="document_analysis">文档分析</span> </a>
+            <div class="nav-title" data-i18n="sidebar.team_database">团队数据库</div>
+            <a href="mydash" class="nav-item"> <i class="fas fa-bar-chart"></i> <span data-i18n="sidebar.upload_contract_cn">上传合同</span> </a>
+            <a href="upload_contract" class="nav-item"> <i class="fas fa-file-upload"></i> <span data-i18n="sidebar.upload_contract">上传合同</span> </a>
+            <a href="history" class="nav-item active"> <i class="fas fa-history"></i> <span data-i18n="sidebar.analysis_history">分析历史</span> </a>
+            <a href="analysis" class="nav-item"> <i class="fas fa-folder-open"></i> <span data-i18n="sidebar.document_analysis">文档分析</span> </a>
         </div>
         <div class="nav-section">
-            <div class="nav-title" data-i18n="account">账户</div>
-            <a href="profile" class="nav-item"> <i class="fas fa-user"></i> <span data-i18n="user_profile">用户资料</span> </a>
-            <a href="subscriptions" class="nav-item"> <i class="fas fa-star"></i> <span data-i18n="subscriptions">订阅</span> </a>
+            <div class="nav-title" data-i18n="sidebar.account">账户</div>
+            <a href="profile" class="nav-item"> <i class="fas fa-user"></i> <span data-i18n="sidebar.user_profile">用户资料</span> </a>
+            <a href="subscriptions" class="nav-item"> <i class="fas fa-star"></i> <span data-i18n="sidebar.subscriptions">订阅</span> </a>
         </div>
         <div class="nav-section">
-            <div class="nav-title" data-i18n="support">支持</div>
-            <a href="contactus" class="nav-item"> <i class="fas fa-envelope"></i> <span data-i18n="contact_us">联系我们</span> </a>
-            <a href="helpcenter" class="nav-item"> <i class="fas fa-question-circle"></i> <span data-i18n="faq">常见问题</span> </a>
-            <a href="aboutus" class="nav-item"> <i class="fas fa-info-circle"></i> <span data-i18n="about_us">关于我们</span> </a>
-            <a href="whats-new" class="nav-item "><i class="fas fa-info-circle"></i><span data-i18n="whats_new">有什么新的</span></a>
+            <div class="nav-title" data-i18n="sidebar.support">支持</div>
+            <a href="contactus" class="nav-item"> <i class="fas fa-envelope"></i> <span data-i18n="sidebar.contact_us">联系我们</span> </a>
+            <a href="helpcenter" class="nav-item"> <i class="fas fa-question-circle"></i> <span data-i18n="sidebar.faq">常见问题</span> </a>
+            <a href="aboutus" class="nav-item"> <i class="fas fa-info-circle"></i> <span data-i18n="sidebar.about_us_support">关于我们</span> </a>
+            <a href="whats-new" class="nav-item "><i class="fas fa-info-circle"></i><span data-i18n="sidebar.whats_new">有什么新的</span></a>
         </div>
     </nav>
     
@@ -266,53 +262,47 @@
     <input type="hidden" name="filename" id="filenameInput">
     </form>
     <!-- 主要内容 -->
-    <main class="main-content">
+    <div class="container">
         <div class="dashboard-header">
-            <h1 data-i18n="history_header">Analysis History</h1>
-            <a href="/upload_contract" class="primary-btn" data-i18n="upload_another_contract">
-                <i class="fas fa-plus"></i> Upload Another Contract
-            </a>
+            <h1 data-i18n="history.title">分析历史与文档库</h1>
         </div>
 
+        <!-- 分析历史 -->
+        <!-- Analysis History -->
         <div class="card">
-            <input type="text" id="searchInput" class="search-bar" data-i18n="[placeholder]search_placeholder" placeholder="Search by filename or date...">
-            <table>
+            <h2 data-i18n="history.analysis_history">分析历史</h2>
+            <input type="text" class="search-bar" data-i18n="[placeholder]history.search_placeholder" placeholder="搜索分析历史..." onkeyup="searchTable('historyTable', this.value)">
+            <table id="historyTable">
                 <thead>
                     <tr>
-                        <th data-i18n="col_filename">Filename</th>
-                        <th data-i18n="col_upload_date">Upload Date</th>
-                        <th data-i18n="col_status">Status</th>
-                        <th data-i18n="col_actions">Actions</th>
+                        <th data-i18n="history.table.date">日期</th>
+                        <th data-i18n="history.table.analysis_name">分析名称</th>
+                        <th data-i18n="history.table.file_name">文件名</th>
+                        <th data-i18n="history.table.status">状态</th>
+                        <th data-i18n="history.table.action">行动</th>
                     </tr>
                 </thead>
-                <tbody id="historyTableBody">
-                    {% for file in files %}
+                <tbody>
+                    {% for file in history %}
                     <tr>
-                        <td>{{ file.file_name }}</td>
-                        <td>{{ file.uploaded_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                        <td>
-                            <span class="status-chip status-completed">Completed</span>
-                        </td>
+                        <td>{{file[3]}}</td>
+                        <td>{{file[2]}}</td>
+                        <td>{{file[0]}}</td>
+                        <td data-i18n="history.table.reviewed">Reviewed</td>
+
                         <td class="table-actions">
-                            <a href="/analysis?filename={{ file.file_name }}" class="icon-btn" title="View Report" data-i18n="[title]view_report_hover">
-                                <i class="fas fa-chart-line"></i>
-                            </a>
-                            <a href="/document?filename={{ file.file_name }}" class="icon-btn" title="Download File" data-i18n="[title]download_file_hover">
-                                <i class="fas fa-download"></i>
-                            </a>
-                            <form id="deleteForm{{ loop.index }}" action="/delete_file" method="post" style="display:inline;">
-                                <input type="hidden" name="filename" value="{{ file.file_name }}">
-                                <button type="button" class="icon-btn" title="Delete File" data-i18n="[title]delete_file_hover" onclick="confirmDelete('{{ file.file_name }}', {{ loop.index }})">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </form>
+                            <button class="icon-btn" data-filename="{{file[0]}}" data-action="view" data-i18n="[title]history.table.view_title" title="查看"><i class="fas fa-eye"></i></button>
+                            <button class="icon-btn" data-filename="{{file[0]}}" data-action="download" data-i18n="[title]history.table.download_title" title="下载"><i class="fas fa-download"></i></button>
+                            <button class="icon-btn" data-filename="{{file[0]}}" data-action="delete" data-i18n="[title]history.table.delete_title" title="删除"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-    </main>
+
+        
+    </div>
 
     <script>
         // Theme Toggle

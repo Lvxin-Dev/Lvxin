@@ -26,6 +26,33 @@ This is a web-based platform for uploading and analyzing legal contracts. It fea
 - PostgreSQL
 - `pip` for package management
 
+### OCR Dependencies
+
+This project uses Tesseract for OCR and Poppler for PDF processing. You will need to install them on your system.
+
+**For macOS (using Homebrew):**
+```bash
+brew install tesseract
+brew install poppler
+```
+
+**For Debian/Ubuntu (using apt-get):**
+```bash
+sudo apt-get update
+sudo apt-get install -y tesseract-ocr
+sudo apt-get install -y poppler-utils
+```
+
+You will also need to install the language data for Tesseract. For Simplified Chinese, you can do the following:
+
+**For macOS:**
+The `tesseract` formula installs all language packs by default.
+
+**For Debian/Ubuntu:**
+```bash
+sudo apt-get install -y tesseract-ocr-chi-sim
+```
+
 ### Installation
 
 1.  **Clone the repository:**
