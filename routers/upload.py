@@ -6,11 +6,13 @@ import aiofiles
 import logging
 from datetime import datetime, timedelta
 import psycopg2.extras
+import shutil
 
 from core.database import get_db_connection, release_db_connection
 from core.security import cookie, verifier, SessionData
 from services.user_management import create_user_folder
 from services.contract_analysis import oss_upload, api_dep
+from services.file_processing import process_pdf, process_docx, process_doc, process_image
 
 # --- Configuration ---
 router = APIRouter()
@@ -249,7 +251,36 @@ async def finish_upload(
                 db.rollback()
                 raise HTTPException(status_code=500, detail="Failed to assemble file.")
 
-            # --- Analysis Pipeline ---
+            # --- Text Extraction from Assembled File ---
+            extracted_text = ""
+            try:
+                file_ext = os.path.splitext(record["file_name"])[1].lower()
+                logger.info(f"Processing file {record['file_name']} with extension {file_ext}")
+
+                if file_ext == '.pdf':
+                    _, extracted_text = process_pdf(final_file_path)
+                elif file_ext == '.docx':
+                    _, extracted_text = process_docx(final_file_path)
+                elif file_ext == '.doc':
+                    _, extracted_text = process_doc(final_file_path)
+                elif file_ext in ['.png', '.jpg', '.jpeg', '.tiff']:
+                    _, extracted_text = process_image(final_file_path)
+                else:
+                    logger.warning(f"Unsupported file type for text extraction: {file_ext}")
+
+                logger.info(f"Successfully extracted text from {record['file_name']}. Character count: {len(extracted_text)}")
+                # Here, you would typically pass the `extracted_text` to the next step of your analysis pipeline.
+                # For now, we're just logging it.
+            
+            except Exception as e:
+                logger.error(f"Text extraction failed for {upload_id}: {e}")
+                db.rollback()
+                # Decide if this should be a fatal error. Maybe the analysis can proceed without text.
+                # For now, we'll treat it as a failure.
+                raise HTTPException(status_code=500, detail="File text extraction failed.")
+
+
+            # --- Analysis Pipeline (External API) ---
             try:
                 logger.info(f"File {record['file_name']} assembled. Starting analysis pipeline...")
                 oss_url = oss_upload(final_file_path, record['file_name'])
@@ -294,13 +325,11 @@ async def finish_upload(
         raise HTTPException(status_code=500, detail="An unexpected error occurred during finalization.")
     finally:
         # --- Cleanup ---
-        if chunk_dir and chunk_files:
+        if chunk_dir and os.path.exists(chunk_dir):
             try:
-                for chunk_filename in chunk_files:
-                    os.remove(os.path.join(chunk_dir, chunk_filename))
-                os.rmdir(chunk_dir)
+                shutil.rmtree(chunk_dir)
                 logger.info(f"Successfully cleaned up temporary directory {chunk_dir}.")
             except OSError as e:
                 logger.warning(f"Failed to clean up temporary directory {chunk_dir} for upload {upload_id}: {e}")
 
-    return {"message": "File uploaded and analysis started successfully."} 
+    return {"message": "File uploaded and analysis started successfully.", "filename": record["file_name"]}

@@ -16,6 +16,21 @@ class TestFileProcessing(unittest.TestCase):
 
     @patch('services.file_processing.PdfReader')
     @patch('services.file_processing.ocr_pdf')
+    def test_process_pdf_direct_extraction(self, mock_ocr_pdf, mock_pdf_reader):
+        # Arrange
+        mock_page = MagicMock()
+        mock_page.extract_text.return_value = "This is a standard PDF with plenty of text content."
+        mock_pdf_reader.return_value.pages = [mock_page]
+        
+        # Act
+        num_pages, text = process_pdf("dummy.pdf")
+        
+        # Assert
+        mock_ocr_pdf.assert_not_called()
+        self.assertEqual(text, "This is a standard PDF with plenty of text content.")
+
+    @patch('services.file_processing.PdfReader')
+    @patch('services.file_processing.ocr_pdf')
     def test_process_pdf_fallback_to_ocr(self, mock_ocr_pdf, mock_pdf_reader):
         # Arrange
         mock_page = MagicMock()
