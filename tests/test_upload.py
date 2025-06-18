@@ -3,10 +3,14 @@ import shutil
 import uuid
 from fastapi.testclient import TestClient
 from unittest.mock import patch, MagicMock
+from dotenv import load_dotenv
+import sys
 
 # Add the project root to the Python path to allow for absolute imports
-import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+# Load test environment variables
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env.test'))
 
 from main import app
 from core.database import get_db_connection, release_db_connection

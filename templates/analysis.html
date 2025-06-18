@@ -8,6 +8,10 @@
     <link rel="stylesheet" href="../static/CSS/stylee.css">
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/i18next@21.6.10/i18next.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/i18next-http-backend@1.3.2/i18nextHttpBackend.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/i18next-browser-languagedetector@6.1.3/i18nextBrowserLanguageDetector.min.js"></script>
+    <script src="../static/JS/i18n.js"></script>
     <style>
         /* Color Scheme */
         :root {
@@ -776,11 +780,15 @@
         </div>
 
         <div class="nav-links">
-            <a href="subscriptions" class="en-content">Pricing</a>
-            <a href="aboutus" class="en-content">About Us</a>
-            <a href="helpcenter" class="en-content">Help Center</a>
+            <a href="subscriptions" class="en-content" data-i18n="header.pricing">Pricing</a>
+            <a href="aboutus" class="en-content" data-i18n="header.about_us">About Us</a>
+            <a href="helpcenter" class="en-content" data-i18n="header.help_center">Help Center</a>
         </div>
         <div class="actions">
+            <select id="language-selector" class="language-selector" aria-label="Language selector" style="background-color: var(--card-bg); color: var(--text-primary); border: 1px solid var(--border); border-radius: 5px; padding: 0.3rem 0.5rem; margin-right: 0.5rem;">
+                <option value="en">English</option>
+                <option value="zh">中文</option>
+            </select>
             <button id="themeToggle" class="icon-btn">
                 <i class="fas fa-moon"></i>
             </button>
@@ -798,23 +806,23 @@
     <!-- Sidebar -->
     <nav class="sidebar" id="sidebar">
         <div class="nav-section">
-            <h3 class="nav-title">Team Database</h3>
-            <a href="mydash" class="nav-item"> <i class="fas fa-bar-chart"></i> 上传合同 </a>
-            <a href="upload_contract" class="nav-item"><i class="fas fa-file-upload"></i> Upload Contract</a>
-            <a href="history" class="nav-item"><i class="fas fa-history"></i> Analysis History</a>
-            <a href="Analytics_Dashboard" class="nav-item active"><i class="fas fa-file-contract"></i> Document Analysis</a>
+            <h3 class="nav-title" data-i18n="sidebar.team_database">Team Database</h3>
+            <a href="mydash" class="nav-item"> <i class="fas fa-bar-chart"></i> <span data-i18n="sidebar.upload_contract_cn">上传合同</span> </a>
+            <a href="upload_contract" class="nav-item"><i class="fas fa-file-upload"></i> <span data-i18n="sidebar.upload_contract">Upload Contract</span></a>
+            <a href="history" class="nav-item"><i class="fas fa-history"></i> <span data-i18n="sidebar.analysis_history">Analysis History</span></a>
+            <a href="Analytics_Dashboard" class="nav-item active"><i class="fas fa-file-contract"></i> <span data-i18n="sidebar.document_analysis">Document Analysis</span></a>
         </div>
         <div class="nav-section">
-            <h3 class="nav-title">Account</h3>
-            <a href="profile" class="nav-item"><i class="fas fa-user"></i> User Profile</a>
-            <a href="subscriptions" class="nav-item"><i class="fas fa-star"></i> Subscriptions</a>
+            <h3 class="nav-title" data-i18n="sidebar.account">Account</h3>
+            <a href="profile" class="nav-item"><i class="fas fa-user"></i> <span data-i18n="sidebar.user_profile">User Profile</span></a>
+            <a href="subscriptions" class="nav-item"><i class="fas fa-star"></i> <span data-i18n="sidebar.subscriptions">Subscriptions</span></a>
         </div>
         <div class="nav-section">
-            <h3 class="nav-title">Support</h3>
-            <a href="contactus" class="nav-item"><i class="fas fa-envelope"></i> Contact Us</a>
-            <a href="helpcenter" class="nav-item"><i class="fas fa-question-circle"></i> FAQs</a>
-            <a href="aboutus" class="nav-item"><i class="fas fa-info-circle"></i> About Us</a>
-            <a href="whats-new" class="nav-item"><i class="fas fa-info-circle"></i> What's New</a>
+            <h3 class="nav-title" data-i18n="sidebar.support">Support</h3>
+            <a href="contactus" class="nav-item"><i class="fas fa-envelope"></i> <span data-i18n="sidebar.contact_us">Contact Us</span></a>
+            <a href="helpcenter" class="nav-item"><i class="fas fa-question-circle"></i> <span data-i18n="sidebar.faqs">FAQs</span></a>
+            <a href="aboutus" class="nav-item"><i class="fas fa-info-circle"></i> <span data-i18n="sidebar.about_us">About Us</span></a>
+            <a href="whats-new" class="nav-item"><i class="fas fa-info-circle"></i> <span data-i18n="sidebar.whats_new">What's New</span></a>
         </div>
     </nav>
 
@@ -824,28 +832,28 @@
         <div class="tab-nav">
             <div class="tab-group">
                 <button class="tab-btn active" data-tab="overview">
-                    <i class="fas fa-chart-pie"></i> Overview
+                    <i class="fas fa-chart-pie"></i> <span data-i18n="tabs.overview">Overview</span>
                 </button>
                 <button class="tab-btn" data-tab="risks">
-                    <i class="fas fa-exclamation-triangle"></i> Risks
+                    <i class="fas fa-exclamation-triangle"></i> <span data-i18n="tabs.risks">Risks</span>
                 </button>
                 <button class="tab-btn" data-tab="suggestions">
-                    <i class="fas fa-lightbulb"></i> Suggestions
+                    <i class="fas fa-lightbulb"></i> <span data-i18n="tabs.suggestions">Suggestions</span>
                 </button>
                 <button class="tab-btn" onclick="window.location.href='document'">
-                    <i class="fas fa-file-alt"></i> Document
+                    <i class="fas fa-file-alt"></i> <span data-i18n="tabs.document">Document</span>
                 </button>
             </div>
             
             <div class="tab-actions">
                 <button class="action-btn primary">
-                    <i class="fas fa-file-pdf"></i> Export to PDF
+                    <i class="fas fa-file-pdf"></i> <span data-i18n="actions.export_to_pdf">Export to PDF</span>
                 </button>
                 <button class="action-btn secondary">
-                    <i class="fas fa-share-alt"></i> Share Report
+                    <i class="fas fa-share-alt"></i> <span data-i18n="actions.share_report">Share Report</span>
                 </button>
                 <button class="action-btn secondary">
-                    <i class="fas fa-calendar-alt"></i> Schedule Meeting
+                    <i class="fas fa-calendar-alt"></i> <span data-i18n="actions.schedule_meeting">Schedule Meeting</span>
                 </button>
             </div>
         </div>
@@ -856,7 +864,7 @@
         <div id="risks-tab" class="tab-content">
             <div class="risk-container">
                 <div class="risk-chart-container">
-                    <h2>Risk Distribution <span class="rule-sequence">1.1</span></h2>
+                    <h2 data-i18n="risks.risk_distribution">Risk Distribution <span class="rule-sequence">1.1</span></h2>
                     <div class="chart-container">
                         <canvas id="riskChart"></canvas>
                     </div>
@@ -864,17 +872,17 @@
                 
                 <div class="risk-details-container">
                     <div class="risk-clause-card">
-                        <h2>Risk Clause</h2>
-                        <p>Contract party qualifications not clearly specified</p>
+                        <h2 data-i18n="risks.risk_clause">Risk Clause</h2>
+                        <p data-i18n="risks.qualification_not_specified">Contract party qualifications not clearly specified</p>
                     </div>
                     
                     <div class="risk-analysis-card">
-                        <h2>Risk Analysis</h2>
-                        <p>Since the contract text does not clearly specify the specific identity information of Party A and Party B, such as whether a natural person has full civil capacity or whether a legal person is legally established and validly existing, nor does it mention that both parties need to show each other proof of identity and existence and qualifications before signing the contract, there may be legal risks during contract execution.</p>
-                        <button class="summarize-btn">Summarize Risk</button>
+                        <h2 data-i18n="risks.risk_analysis">Risk Analysis</h2>
+                        <p data-i18n="risks.analysis_details">Since the contract text does not clearly specify the specific identity information of Party A and Party B, such as whether a natural person has full civil capacity or whether a legal person is legally established and validly existing, nor does it mention that both parties need to show each other proof of identity and existence and qualifications before signing the contract, there may be legal risks during contract execution.</p>
+                        <button class="summarize-btn" data-i18n="risks.summarize_risk">Summarize Risk</button>
                         <div class="risk-brief">
-                            <h3>Risk Brief</h3>
-                            <p>The contract lacks clear identification requirements for both parties, which could lead to legal issues regarding the validity and enforceability of the contract.</p>
+                            <h3 data-i18n="risks.risk_brief">Risk Brief</h3>
+                            <p data-i18n="risks.brief_details">The contract lacks clear identification requirements for both parties, which could lead to legal issues regarding the validity and enforceability of the contract.</p>
                         </div>
                     </div>
                 </div>
@@ -882,16 +890,16 @@
         </div>
 
         <div id="suggestions-tab" class="tab-content">
-            <h2>Suggestions Page</h2>
-            <p>This is the suggestions page showing recommended amendments.</p>
-            <p>It will display original content alongside suggested modifications from the API.</p>
+            <h2 data-i18n="suggestions.page_title">Suggestions Page</h2>
+            <p data-i18n="suggestions.page_description">This is the suggestions page showing recommended amendments.</p>
+            <p data-i18n="suggestions.api_content">It will display original content alongside suggested modifications from the API.</p>
         </div>
 
        <div id="document-tab" class="tab-content">
             <div style="text-align: center; padding: 40px;">
                 <button id="viewDocumentBtn" class="nav-button" 
                         style="padding: 12px 24px; background: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem;">
-                    <i class="fas fa-file-alt"></i> View Full Document
+                    <i class="fas fa-file-alt"></i> <span data-i18n="document.view_full_document">View Full Document</span>
                 </button>
             </div>
         </div>
@@ -1237,37 +1245,37 @@
         </style>
 
         <div class="overview-container">
-            <div class="overview-heading">Risk Assessment</div>
+            <div class="overview-heading" data-i18n="overview.risk_assessment">Risk Assessment</div>
 
             <div class="risk-bar-wrapper">
                 <div class="risk-marker"></div>
             </div>
 
             <div class="risk-labels">
-                <span>Low</span><span>Medium</span><span>High</span>
+                <span data-i18n="overview.low">Low</span><span data-i18n="overview.medium">Medium</span><span data-i18n="overview.high">High</span>
             </div>
 
             <div class="risk-level-text risk-${result.riskLevel ? result.riskLevel.toLowerCase() : 'medium'}">
-                ${result.riskLevel || 'Medium'} Risk (${result.ruleSequence || '1.1'})
+                ${result.riskLevel || 'Medium'} <span data-i18n="overview.risk">Risk</span> (${result.ruleSequence || '1.1'})
             </div>
 
-            <div class="section-heading">Key Terms</div>
+            <div class="section-heading" data-i18n="overview.key_terms">Key Terms</div>
 
             <div class="info-grid">
                 <div class="card">
-                    <h4>Examination Result</h4>
+                    <h4 data-i18n="overview.examination_result">Examination Result</h4>
                     <p>${result.examineResult || 'No examination result available'}</p>
                 </div>
                 <div class="card">
-                    <h4>Rule Title</h4>
+                    <h4 data-i18n="overview.rule_title">Rule Title</h4>
                     <p>${result.ruleTitle || 'No rule title available'}</p>
                 </div>
                 <div class="card">
-                    <h4>Examination Brief</h4>
+                    <h4 data-i18n="overview.examination_brief">Examination Brief</h4>
                     <p>${result.examineBrief || 'No examination brief available'}</p>
                 </div>
                 <div class="card">
-                    <h4>Rule Tag</h4>
+                    <h4 data-i18n="overview.rule_tag">Rule Tag</h4>
                     <p>${result.ruleTag || 'No rule tag available'}</p>
                 </div>
             </div>
@@ -1304,30 +1312,30 @@
             risksTab.innerHTML = `
                 <div class="risk-container">
                     <div class="risk-chart-container">
-                        <h2>Risk Distribution <span class="rule-sequence">${result.ruleSequence || '1.1'}</span></h2>
+                        <h2 data-i18n="risks.risk_distribution">Risk Distribution <span class="rule-sequence">${result.ruleSequence || '1.1'}</span></h2>
                         <div class="chart-container">
                             <canvas id="riskChart"></canvas>
                         </div>
                         <div class="risk-chart-summary">
                             <div class="risk-level-display risk-${result.riskLevel ? result.riskLevel.toLowerCase() : 'medium'}">
                                 <i class="fas fa-exclamation-triangle"></i>
-                                Overall Risk: ${result.riskLevel || 'Medium'}
+                                <span data-i18n="risks.overall_risk">Overall Risk</span>: ${result.riskLevel || 'Medium'}
                             </div>
                         </div>
                     </div>
                     
                     <div class="risk-details-container">
                         <div class="risk-clause-card">
-                            <h2>Risk Clause</h2>
+                            <h2 data-i18n="risks.risk_clause">Risk Clause</h2>
                             <p>${result.subRisks[0].riskClause || 'General Risk'}</p>
                         </div>
                         
                         <div class="risk-analysis-card">
-                            <h2>Risk Analysis</h2>
+                            <h2 data-i18n="risks.risk_analysis">Risk Analysis</h2>
                             <p>${result.subRisks[0].riskExplain || 'No risk explanation available'}</p>
-                            <button class="summarize-btn">Summarize Risk</button>
+                            <button class="summarize-btn" data-i18n="risks.summarize_risk.hide" data-i18n-show="risks.summarize_risk.show">Summarize Risk</button>
                             <div class="risk-brief">
-                                <h3>Risk Brief</h3>
+                                <h3 data-i18n="risks.risk_brief">Risk Brief</h3>
                                 <p>${result.subRisks[0].riskBrief || 'No brief available'}</p>
                             </div>
                         </div>
@@ -1350,8 +1358,8 @@
             document.getElementById('risks-tab').innerHTML = `
                 <div class="risk-container">
                     <div class="risk-chart-container">
-                        <h2>Risk Distribution</h2>
-                        <p>No detailed risk information available</p>
+                        <h2 data-i18n="risks.risk_distribution">Risk Distribution</h2>
+                        <p data-i18n="risks.no_detail">No detailed risk information available</p>
                     </div>
                 </div>
             `;
@@ -1361,20 +1369,20 @@
         if (result.subRisks && result.subRisks.some(subRisk => subRisk.resultContent)) {
             const suggestionsTab = document.getElementById('suggestions-tab');
             suggestionsTab.innerHTML = `
-                <h2 class="modifications-title">Suggested Modifications <span class="rule-sequence">${result.ruleSequence || '1.1'}</span></h2>
+                <h2 class="modifications-title" data-i18n="suggestions.suggested_modifications">Suggested Modifications <span class="rule-sequence">${result.ruleSequence || '1.1'}</span></h2>
                 ${result.subRisks.filter(subRisk => subRisk.resultContent).map(subRisk => `
                     <div class="content-section modification-item">
                         <h3 class="modification-heading">${subRisk.riskClause || 'Modification'}</h3>
-                        ${subRisk.resultType ? `<p class="modification-action"><strong>Action:</strong> ${subRisk.resultType}</p>` : ''}
+                        ${subRisk.resultType ? `<p class="modification-action"><strong data-i18n="suggestions.action">Action:</strong> ${subRisk.resultType}</p>` : ''}
                         <div class="contract-block original-block">
                             <h4 class="block-title">
-                                <span style="color: black;">Original Content</span>
+                                <span style="color: black;" data-i18n="suggestions.original_content">Original Content</span>
                             </h4>
                             <pre>${subRisk.originalContent || 'No original content available'}</pre>
                         </div>
                         <div class="contract-block suggested-block">
                             <h4 class="block-title">
-                                <span style="color: black;">Suggested Content</span>
+                                <span style="color: black;" data-i18n="suggestions.suggested_content">Suggested Content</span>
                             </h4>
                             <pre>${subRisk.resultContent || 'No suggested content available'}</pre>
                         </div>
@@ -1383,8 +1391,8 @@
             `;
         } else {
             document.getElementById('suggestions-tab').innerHTML = `
-                <h2>Suggestions</h2>
-                <p>No suggested modifications available for this section.</p>
+                <h2 data-i18n="suggestions.title">Suggestions</h2>
+                <p data-i18n="suggestions.no_suggestions">No suggested modifications available for this section.</p>
             `;
         }
 
@@ -1428,8 +1436,8 @@
             // Show a message to the user
             document.getElementById('overview-tab').innerHTML = `
                 <div class="content-section">
-                    <h3>No Contract Data Available</h3>
-                    <p>Please upload a contract to analyze or check your API connection.</p>
+                    <h3 data-i18n="overview.no_contract_data">No Contract Data Available</h3>
+                    <p data-i18n="overview.upload_or_check_connection">Please upload a contract to analyze or check your API connection.</p>
                 </div>
             `;
         }
