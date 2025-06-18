@@ -242,6 +242,44 @@
                 color: whitesmoke;
             }
             
+            .otp-container {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                margin: 20px 0;
+            }
+
+            .otp-input {
+                width: 45px;
+                height: 50px;
+                text-align: center;
+                font-size: 1.5rem;
+                border: 2px solid var(--primary);
+                border-radius: 8px;
+                transition: all 0.3s ease;
+            }
+
+            .otp-input:focus {
+                outline: none;
+                border-color: var(--secondary);
+                transform: scale(1.1);
+            }
+            .feedback {
+                font-size: 0.9em;
+                margin-top: -10px;
+                margin-bottom: 15px;
+                min-height: 20px;
+            }
+            .feedback.error {
+                color: var(--danger);
+            }
+            .feedback.success {
+                color: var(--success);
+            }
+            .hidden {
+                display: none;
+            }
+            
             @media (max-width: 480px) {
                 .login-container {
                     padding: 25px;
@@ -263,13 +301,13 @@
     <body>
         <!-- Add error message section here -->
          <div class="signup-options-container">
-            <h1>Sign up as...</h1>
+            <h1>Sign up with...</h1>
             <div class="options-container">
-                <div id="user-option" class="signup-option">
-                    User
+                <div id="email-option" class="signup-option active">
+                    Email
                 </div>
-                <div id="company-option" class="signup-option">
-                    Company
+                <div id="phone-option" class="signup-option">
+                    Phone
                 </div>
             </div>
          </div>
@@ -280,8 +318,6 @@
 
             <h1>LVXIN - Sign Up</h1>
 
-            <script src="https://static.elfsight.com/platform/platform.js" async></script>
-            <div class="elfsight-app-6f017616-600a-46e6-a14a-f6ac550a093e" data-elfsight-app-lazy></div>
             <div class="social-login">
                 <a href="/login/google" class="social-btn google-btn">
                     <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNMTcuNiA5LjJsLS4xLTEuOEg5djMuNGg0LjhDMTMuNiAxMiAxMyAxMyAxMiAxMy42djIuMmgzYTguOCA4LjggMCAwIDAgMi42LTYuNnoiIGZpbGw9IiM0Mjg1RjQiIGZpbGwtcnVsZT0ibm9uemVybyIvPjxwYXRoIGQ9Ik05IDE4YzIuNCAwIDQuNS0uOCA2LTIuMmwtMy0yLjJhNS40IDUuNCAwIDAgMS04LTIuOUgxVjEzYTkgOSAwIDAgMCA4IDV6IiBmaWxsPSIjMzRBODUzIiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNNCAxMC43YTUuNCA1LjQgMCAwIDEgMC0zLjRWNUgxYTkgOSAwIDAgMCAwIDhsMy0yLjN6IiBmaWxsPSIjRkJCQzA1IiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNOSAzLjZjMS4zIDAgMi41LjQgMy40IDEuM0wxNSAyLjNBOSA5IDAgMCAwIDEgNWwzIDIuNGE1LjQgNS40IDAgMCAxIDUtMy43eiIgZmlsbD0iI0VBNDMzNSIgZmlsbC1ydWxlPSJub256ZXJvIi8+PHBhdGggZD0iTTAgMGgxOHYxOEgweiIvPjwvZz48L3N2Zz4=" />
@@ -298,116 +334,109 @@
                 {{ error_message }}
             </div>
             {% endif %}
-            <form id="user" action='signup' method="POST" enctype="multipart/form-data">
-                
-                <div class="form-group">
-                    <label for="fullname">Full Name</label>
-                    <input type="text" id="fullname" name="fullname"  required>
-                </div>
-    
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email"  required>
-                </div>
-    
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username" placeholder="Create a Unique one"  required>
-                </div>
 
-                <div class="form-group">
-                    <label for="phone">Phone</label>
-                    <input type="text" id="phone" name="phone"  >
-                </div>
-    
-               
-    
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-    
-                <div class="form-group">
-                    <label for="confirm_password">Confirm Password</label>
-                    <input type="password" id="confirm_password" name="confirm_password" required>
-                </div>
-
-                <button type="submit " class="submit-btn ">Sign up </button>
-
-
-                <div class="links ">
-                    <a href="signin ">Already have an account? SignIn</a>
-                </div>
+            <div id="email-form-container">
+                <form id="user-email-form" action='/signup' method="POST">
+                    <div class="form-group">
+                        <label for="fullname">Full Name</label>
+                        <input type="text" id="fullname" name="fullname"  required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email"  required>
+                    </div>
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" placeholder="Create a Unique one"  required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                    <button type="submit " class="submit-btn ">Sign up with Email</button>
                 </form>
-                <form id="company" action='signup' method="POST" enctype="multipart/form-data">
-                
-                    <div class="form-group">
-                        <label for="fullname-company">Full Company Name</label>
-                        <input type="text" id="fullname-company" name="fullname-company"  required>
-                    </div>
-        
-                    <div class="form-group">
-                        <label for="email-company">Company Email</label>
-                        <input type="email" id="email-company" name="email-company"  required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="Id-company">Company License 'It will be verified'</label>
-                        <input type="text" id="Id-company" name="Id-company"  required>
-                    </div>
-    
-                    <div class="form-group">
-                        <label for="phone-company">Company Hotline</label>
-                        <input type="text" id="phone-company" name="phone-company"  >
-                    </div>
-        
-                   
-        
-                    <div class="form-group">
-                        <label for="password-company">Password</label>
-                        <input type="password" id="password-company" name="password-company" required>
-                    </div>
-        
-                    <div class="form-group">
-                        <label for="confirm_password-company">Confirm Password</label>
-                        <input type="password" id="confirm_password-company" name="confirm_password-company" required>
-                    </div>
-    
-                    <button type="submit " class="submit-btn ">Sign up</button>
-    
-    
-                    <div class="links ">
-                        <a href="signin ">Already have an account? SignIn</a>
-                    </div>
-                    </form>
             </div>
-            
-            <script>
-                function wechatSignup() {
-                    window.location.href = "https://open.weixin.qq.com/connect/qrconnect?appid=YOUR_APP_ID&redirect_uri=YOUR_REDIRECT_URL&response_type=code&scope=snsapi_login#wechat_redirect ";
-                }
-                document.addEventListener("DOMContentLoaded", ()=> {
-                    const userForm = document.getElementById("user");
-                    const companyForm = document.getElementById("company");
-                    let signup_context = "user";
-                    function changePage(context, userForm, companyForm){
-                        userForm.style.display = "none";
-                        companyForm.style.display = "none";
-                        document.getElementById(context).style.display = "block";
-                        document.querySelectorAll(".signup-option").forEach((o) => {
-                            o.classList.remove("active");
-                        });
-                        document.getElementById(`${context}-option`).classList.add("active");
+
+            <div id="phone-form-container" class="hidden">
+                 <form id="phone-signup-form">
+                    <div class="form-group">
+                        <label for="phone-fullname">Full Name</label>
+                        <input type="text" id="phone-fullname" name="fullname" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone-email">Email</label>
+                        <input type="email" id="phone-email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone-username">Username</label>
+                        <input type="text" id="phone-username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone-number">Phone Number</label>
+                        <input type="tel" id="phone-number" name="phone" required placeholder="+1 (555) 555-5555">
+                        <div id="phone-feedback" class="feedback"></div>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" id="send-code-btn" class="submit-btn">Send Code</button>
+                    </div>
+                    <div id="otp-section" class="hidden">
+                        <div class="form-group">
+                            <label for="otp">Verification Code</label>
+                            <div class="otp-container">
+                                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]">
+                                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]">
+                                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]">
+                                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]">
+                                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]">
+                                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]">
+                            </div>
+                            <div id="otp-feedback" class="feedback"></div>
+                        </div>
+                        <div class="form-group">
+                           <label for="phone-password">Password</label>
+                           <input type="password" id="phone-password" name="password" required>
+                        </div>
+                        <button type="submit" class="submit-btn">Sign Up</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="links ">
+                <a href="signin ">Already have an account? SignIn</a>
+            </div>
+        </div>
+        
+        <script src="https://unpkg.com/libphonenumber-js@1.10.14/bundle/libphonenumber-js.min.js"></script>
+        <script src="{{ url_for('static', path='JS/phoneSignup.js') }}"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", ()=> {
+                const emailOption = document.getElementById('email-option');
+                const phoneOption = document.getElementById('phone-option');
+                const emailForm = document.getElementById('email-form-container');
+                const phoneForm = document.getElementById('phone-form-container');
+
+                function switchForm(activeOption) {
+                    emailOption.classList.remove('active');
+                    phoneOption.classList.remove('active');
+                    emailForm.classList.add('hidden');
+                    phoneForm.classList.add('hidden');
+
+                    if (activeOption === 'email') {
+                        emailOption.classList.add('active');
+                        emailForm.classList.remove('hidden');
+                    } else {
+                        phoneOption.classList.add('active');
+                        phoneForm.classList.remove('hidden');
                     }
-                    changePage(signup_context, userForm, companyForm);
-                    document.getElementById("user-option").addEventListener("click",(e)=>{
-                        changePage("user", userForm, companyForm);
-                    });
-                    document.getElementById("company-option").addEventListener("click",(e)=>{
-                        changePage("company", userForm, companyForm);
-                    });
-                });
-            </script>
+                }
+                
+                emailOption.addEventListener('click', () => switchForm('email'));
+                phoneOption.addEventListener('click', () => switchForm('phone'));
+
+                // Initialize with email form active
+                switchForm('email');
+            });
+        </script>
     </body>
 
 </html>

@@ -17,7 +17,8 @@ from core.security import (
     optional_cookie,
 )
 import psycopg2 as pg
-from services.user_management import create_user_folder, save_user_data
+from services.user_management import create_user_folder, save_user_data, create_user_in_db
+from services.phone_verification import phone_verification_service
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -119,43 +120,91 @@ async def signup_form(
     phone: str = Form(...),
     username: str = Form(...)
 ):
-    conn = get_db_connection()
-    cur = conn.cursor()
-    
     try:
-        # Check for existing user
-        cur.execute("SELECT email FROM users WHERE email = %s OR username = %s OR phone = %s", (email, username, phone))
-        if cur.fetchone():
+        hashed_password = get_password_hash(password)
+        new_user = create_user_in_db(
+            fullname=fullname,
+            email=email,
+            password=hashed_password,
+            phone=phone,
+            username=username
+        )
+
+        if not new_user:
             return templates.TemplateResponse(
                 "signup.html",
                 {"request": request, "error_message": "User with these details already exists."},
             )
 
-        user_id = str(uuid4())
-        hashed_password = get_password_hash(password)
-        
-        cur.execute(
-            "INSERT INTO users (user_id, full_name, email, password, phone, username) VALUES (%s, %s, %s, %s, %s, %s)",
-            (user_id, fullname, email, hashed_password, phone, username),
-        )
-        conn.commit()
-        
-        # User folder creation logic should be here or in a dedicated service
-        create_user_folder(user_id, username)
-        save_user_data(user_id, username, fullname, email)
+        # User folder creation logic
+        create_user_folder(new_user['user_id'], new_user['username'])
+        save_user_data(new_user['user_id'], new_user['username'], new_user['full_name'], new_user['email'])
 
         return RedirectResponse(url="/signin", status_code=status.HTTP_303_SEE_OTHER)
 
-    except pg.Error as e:
-        conn.rollback()
-        logger.error(f"Database error during signup: {e}")
+    except Exception as e:
+        logger.error(f"Error during signup: {e}")
         return templates.TemplateResponse(
             "signup.html",
-            {"request": request, "error_message": "A database error occurred."},
+            {"request": request, "error_message": "An unexpected error occurred."},
         )
-    finally:
-        cur.close()
-        release_db_connection(conn)
+
+
+@router.post("/auth/send-verification-code")
+async def send_verification_code(phone: str = Form(...)):
+    try:
+        # Basic validation for phone number
+        if not phone or not phone.isdigit():
+            raise HTTPException(status_code=400, detail="Invalid phone number format.")
+
+        await phone_verification_service.send_verification_code(phone)
+        return {"message": "Verification code sent successfully."}
+    except Exception as e:
+        logger.error(f"Failed to send verification code to {phone}: {e}")
+        raise HTTPException(status_code=500, detail="Failed to send verification code.")
+
+
+@router.post("/auth/signup-by-phone")
+async def signup_by_phone(
+    request: Request,
+    fullname: str = Form(...),
+    email: str = Form(...),
+    password: str = Form(...),
+    phone: str = Form(...),
+    username: str = Form(...),
+    code: str = Form(...)
+):
+    # Verify OTP
+    is_valid_code = await phone_verification_service.verify_code(phone, code)
+    if not is_valid_code:
+        # This should probably return a JSON response for an API-like endpoint
+        raise HTTPException(status_code=400, detail="Invalid verification code.")
+
+    try:
+        hashed_password = get_password_hash(password)
+        new_user = create_user_in_db(
+            fullname=fullname,
+            email=email,
+            password=hashed_password,
+            phone=phone,
+            username=username
+        )
+
+        if not new_user:
+            raise HTTPException(status_code=409, detail="User with these details already exists.")
+
+        # User folder creation logic
+        create_user_folder(new_user['user_id'], new_user['username'])
+        save_user_data(new_user['user_id'], new_user['username'], new_user['full_name'], new_user['email'])
+
+        # Since this is an API endpoint, we probably want to return a session token
+        # For now, let's just return a success message.
+        # A full implementation would create a session and return the session cookie.
+        return {"message": "User created successfully."}
+
+    except Exception as e:
+        logger.error(f"Error during signup by phone: {e}")
+        raise HTTPException(status_code=500, detail="An unexpected error occurred during signup.")
 
 
 @router.get('/login/google')

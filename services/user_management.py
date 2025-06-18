@@ -6,12 +6,54 @@ from datetime import datetime
 from typing import Optional
 from core.security import SessionData
 from core.database import get_db_connection, release_db_connection
+import psycopg2 as pg
+from uuid import uuid4
 
 logger = logging.getLogger(__name__)
 
 USERS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "users")
 if not os.path.exists(USERS_DIR):
     os.makedirs(USERS_DIR)
+
+def create_user_in_db(
+    fullname: str,
+    email: str,
+    password: str,
+    phone: str,
+    username: str
+) -> Optional[dict]:
+    """Create a new user in the database."""
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute("SELECT email FROM users WHERE email = %s OR username = %s OR phone = %s", (email, username, phone))
+        if cur.fetchone():
+            return None  # User already exists
+
+        user_id = str(uuid4())
+        
+        cur.execute(
+            "INSERT INTO users (user_id, full_name, email, password, phone, username) VALUES (%s, %s, %s, %s, %s, %s) RETURNING user_id, username, email, full_name",
+            (user_id, fullname, email, password, phone, username),
+        )
+        new_user = cur.fetchone()
+        conn.commit()
+
+        if new_user:
+            return {
+                "user_id": new_user[0],
+                "username": new_user[1],
+                "email": new_user[2],
+                "full_name": new_user[3]
+            }
+        return None
+    except pg.Error as e:
+        conn.rollback()
+        logger.error(f"Database error during user creation: {e}")
+        raise
+    finally:
+        cur.close()
+        release_db_connection(conn)
 
 def create_user_folder(user_id: str, username: str) -> str:
     """Create a folder for the user with their ID and username"""
