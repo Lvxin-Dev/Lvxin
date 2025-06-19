@@ -5,6 +5,7 @@ from typing import Optional
 from fastapi import APIRouter, Request, Form, Depends, HTTPException, status
 from fastapi.responses import RedirectResponse, HTMLResponse
 from starlette.templating import Jinja2Templates
+import phonenumbers
 
 from core.config import oauth
 from core.database import get_db_connection, release_db_connection
@@ -152,13 +153,35 @@ async def signup_form(
 
 @router.post("/auth/send-verification-code")
 async def send_verification_code(phone: str = Form(...)):
+    """
+    Validates a phone number, checks if it's already registered,
+    and sends a verification code.
+    """
     try:
-        # Basic validation for phone number
-        if not phone or not phone.isdigit():
-            raise HTTPException(status_code=400, detail="Invalid phone number format.")
+        phone_number = phonenumbers.parse(phone, None)
+        if not phonenumbers.is_valid_number(phone_number):
+            raise HTTPException(status_code=400, detail="Invalid phone number provided.")
 
-        await phone_verification_service.send_verification_code(phone)
+        formatted_phone = phonenumbers.format_number(
+            phone_number, phonenumbers.PhoneNumberFormat.E164
+        )
+
+        # Check if user already exists
+        conn = get_db_connection()
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT 1 FROM users WHERE phone = %s", (formatted_phone,))
+                if cur.fetchone():
+                    raise HTTPException(status_code=409, detail="Phone number already registered.")
+        finally:
+            release_db_connection(conn)
+
+        await phone_verification_service.send_verification_code(formatted_phone)
         return {"message": "Verification code sent successfully."}
+
+    except HTTPException as e:
+        # Re-raise HTTPExceptions to be handled by FastAPI
+        raise e
     except Exception as e:
         logger.error(f"Failed to send verification code to {phone}: {e}")
         raise HTTPException(status_code=500, detail="Failed to send verification code.")
@@ -167,41 +190,57 @@ async def send_verification_code(phone: str = Form(...)):
 @router.post("/auth/signup-by-phone")
 async def signup_by_phone(
     request: Request,
-    fullname: str = Form(...),
-    email: str = Form(...),
     password: str = Form(...),
     phone: str = Form(...),
     username: str = Form(...),
     code: str = Form(...)
 ):
-    # Verify OTP
-    is_valid_code = await phone_verification_service.verify_code(phone, code)
+    """
+    Verifies the OTP and creates a new user account using their phone number.
+    """
+    try:
+        phone_number = phonenumbers.parse(phone, None)
+        if not phonenumbers.is_valid_number(phone_number):
+            raise HTTPException(status_code=400, detail="Invalid phone number provided.")
+        
+        formatted_phone = phonenumbers.format_number(
+            phone_number, phonenumbers.PhoneNumberFormat.E164
+        )
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid phone number format.")
+
+    is_valid_code = await phone_verification_service.verify_code(formatted_phone, code)
     if not is_valid_code:
-        # This should probably return a JSON response for an API-like endpoint
-        raise HTTPException(status_code=400, detail="Invalid verification code.")
+        raise HTTPException(status_code=400, detail="Invalid or expired verification code.")
 
     try:
         hashed_password = get_password_hash(password)
+        # For phone signup, we can use the username as the full name initially.
+        # Email is not required for phone-based signup.
         new_user = create_user_in_db(
-            fullname=fullname,
-            email=email,
+            fullname=username,  # Use username as fullname
+            email=None,         # Email is optional
             password=hashed_password,
-            phone=phone,
+            phone=formatted_phone,
             username=username
         )
 
         if not new_user:
             raise HTTPException(status_code=409, detail="User with these details already exists.")
 
-        # User folder creation logic
         create_user_folder(new_user['user_id'], new_user['username'])
-        save_user_data(new_user['user_id'], new_user['username'], new_user['full_name'], new_user['email'])
+        # Email is not passed as it's not provided during phone signup.
+        save_user_data(
+            new_user['user_id'],
+            new_user['username'],
+            new_user['full_name'],
+            None  # No email
+        )
 
-        # Since this is an API endpoint, we probably want to return a session token
-        # For now, let's just return a success message.
-        # A full implementation would create a session and return the session cookie.
-        return {"message": "User created successfully."}
+        return {"message": "User created successfully. You can now sign in."}
 
+    except HTTPException as e:
+        raise e
     except Exception as e:
         logger.error(f"Error during signup by phone: {e}")
         raise HTTPException(status_code=500, detail="An unexpected error occurred during signup.")
