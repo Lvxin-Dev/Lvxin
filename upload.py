@@ -11,8 +11,8 @@ from datetime import datetime
 import requests
 import os
 from dotenv import load_dotenv
-access_key_id = os.getenv("access_id")
-access_key_secret = os.getenv("sec_key")
+access_key_id = os.getenv("ALIBABA_CLOUD_ACCESS_KEY_ID")
+access_key_secret = os.getenv("ALIBABA_CLOUD_ACCESS_KEY_SECRET")
 workspace_id = os.getenv("work_id")
 
 

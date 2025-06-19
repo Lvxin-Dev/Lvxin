@@ -105,7 +105,7 @@ Run the following command from the root of the project:
 export PYTHONPATH=$(pwd)/venv/lib/python3.12/site-packages; uvicorn main:app --host 127.0.0.1 --port 8000
 ```
 
-**Note**: You will need to provide valid API credentials as environment variables (`access_id`, `sec_key`, `work_id`) for the analysis service to work.
+**Note**: You will need to provide valid API credentials as environment variables (`ALIBABA_CLOUD_ACCESS_KEY_ID`, `ALIBABA_CLOUD_ACCESS_KEY_SECRET`, `work_id`) for the analysis service to work.
 
 #### Development (Mock) Mode
 
@@ -122,8 +122,8 @@ export APP_MODE=development; uvicorn main:app --host 127.0.0.1 --port 8000
 Create a `.env` file in the root of the project and add the following variables.
 
 ```
-access_id=your_access_id_here
-sec_key=your_secret_key_here
+ALIBABA_CLOUD_ACCESS_KEY_ID=your_access_id_here
+ALIBABA_CLOUD_ACCESS_KEY_SECRET=your_secret_key_here
 work_id=your_workspace_id_here
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
