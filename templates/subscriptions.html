@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,695 +5,305 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n="subscriptions_title">Pricing Plans - LVXIN</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="../static/CSS/stylee.css">
-    <script src="https://cdn.jsdelivr.net/npm/i18next@21.6.10/i18next.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/i18next-http-backend@1.3.2/i18nextHttpBackend.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/i18next-browser-languagedetector@6.1.3/i18nextBrowserLanguageDetector.min.js"></script>
-    <script src="../static/JS/i18n.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.bootcdn.net/ajax/libs/i18next/21.6.10/i18next.min.js" defer></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/i18next-http-backend/1.3.2/i18nextHttpBackend.min.js" defer></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/i18next-browser-languagedetector/6.1.3/i18nextBrowserLanguageDetector.min.js" defer></script>
+    <script src="/static/JS/i18n.js" defer></script>
     <style>
-
-        
-        /* Main Content */
-.subscription-popup-overlay {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(44, 62, 80, 0.45);
-  z-index: 2000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: fadeInBg 0.4s;
-}
-@keyframes fadeInBg {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-.subscription-popup {
-  background: #fff;
-  border-radius: 18px;
-  box-shadow: 0 8px 32px rgba(74,144,226,0.18);
-  padding: 2.5rem 2rem 2rem 2rem;
-  max-width: 370px;
-  width: 90%;
-  text-align: center;
-  position: relative;
-  animation: popIn 0.5s cubic-bezier(.68,-0.55,.27,1.55);
-}
-@keyframes popIn {
-  0% { opacity: 0; transform: scale(0.8);}
-  80% { opacity: 1; transform: scale(1.05);}
-  100% { opacity: 1; transform: scale(1);}
-}
-.popup-close {
-  position: absolute;
-  top: 16px; right: 18px;
-  background: none;
-  border: none;
-  font-size: 2rem;
-  color: #aaa;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-.popup-close:hover { color: #e74c3c; }
-.popup-content i {
-  color: #ffb300;
-  font-size: 2.5rem;
-  margin-bottom: 0.5rem;
-  animation: spinStar 1.2s linear infinite alternate;
-}
-@keyframes spinStar {
-  0% { transform: rotate(-15deg);}
-  100% { transform: rotate(15deg);}
-}
-.popup-content h2 {
-  margin: 0.5rem 0 0.7rem 0;
-  font-size: 1.5rem;
-  color: #4a90e2;
-  font-weight: 700;
-}
-.popup-content p {
-  color: #23272f;
-  font-size: 1.05rem;
-  margin-bottom: 1.2rem;
-}
-.popup-cta {
-  background: linear-gradient(90deg, #ffe259 0%, #ffa751 100%);
-  color: #23272f;
-  font-weight: 600;
-  border: none;
-  border-radius: 8px;
-  padding: 0.7rem 2rem;
-  font-size: 1.1rem;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(255, 174, 51, 0.12);
-  transition: filter 0.2s;
-}
-.popup-cta:hover { filter: brightness(1.08);}
-        
-        .main-content {
-            margin-left: 240px;
-            padding: 4rem 2rem;
-            flex: 1;
-            margin-top: 80px;
-            /* Creates space below the navbar */
+        body {
+            font-family: 'Poppins', sans-serif;
         }
-        
-        .dashboard-header {
-            text-align: center;
-            margin-bottom: 2rem;
+        #language-selector {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right .7em top 50%;
+            background-size: .65em auto;
+            padding-right: 2em;
         }
-        
-        .dashboard-header h1 {
-            font-size: 2rem;
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 600;
-        }
-        
-        .dashboard-header .subtitle {
-            color: var(--text-secondary);
-            font-size: 1rem;
-        }
-        
-        .pricing-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
-        }
-        
-        .pricing-card {
-            background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.1);
-            text-align: center;
-            position: relative;
-            border: 2px solid transparent;
-        }
-        
-        .pricing-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(74, 144, 226, 0.2);
-        }
-        
-        .pricing-card.highlight {
-            border-color: var(--primary);
-        }
-        
-        .pricing-card.highlight::after {
-            content: 'Most Popular';
-            position: absolute;
-            top: -10px;
-            right: -40px;
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-            color: white;
-            padding: 0.25rem 1.5rem;
-            transform: rotate(45deg);
-            font-size: 0.8rem;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-        }
-        
-        .plan-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--text-primary);
-            white-space: pre;
-        }
-        
-        .price {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin: 1rem 0;
-        }
-        
-        .price span {
-            font-size: 1rem;
-            color: var(--text-secondary);
-        }
-        
-        .features-list {
-            list-style: none;
-            padding: 0;
-            text-align: left;
-            margin: 1.5rem 0;
-        }
-        
-        .features-list li {
-            padding: 0.5rem 0;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.95rem;
-            color: var(--text-secondary);
-        }
-        
-        .features-list li i {
-            color: var(--success);
-        }
-        
-        .btn-choose {
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            width: 100%;
-            font-weight: 500;
-        }
-        
-        .btn-choose:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
-        }
-        /* Payment Methods */
-        
-        .payment-methods {
-            margin-top: 3rem;
-            text-align: center;
-        }
-        
-        .payment-methods h2 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: var(--text-primary);
-        }
-        
-        .payment-grid {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-        
-        .payment-method {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem;
-            border: 1px solid rgba(74, 144, 226, 0.1);
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        
-        .payment-method:hover {
-            border-color: var(--primary);
-        }
-        
-        .payment-method.selected {
-            border-color: var(--primary);
-            background: rgba(74, 144, 226, 0.05);
-        }
-        
-        .payment-method img {
-            width: 40px;
-            height: 40px;
-            object-fit: contain;
-            margin-right: 0.5rem;
-        }
-        /* Metric Card */
-        
-        .metric-card {
-            background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.1);
-            margin-top: 2rem;
-        }
-        
-        .metric-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: var(--text-primary);
-        }
-        /* Modal Styles */
-        
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        
-        .modal-content {
-            background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 12px;
-            max-width: 400px;
-            width: 90%;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-        
-        .modal-content h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: var(--text-primary);
-        }
-        
-        .modal-actions {
-            display: flex;
-            gap: 1rem;
-            margin-top: 2rem;
-            justify-content: flex-end;
-        }
-        
-        .modal-btn {
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-weight: 500;
-        }
-        
-        .confirm-btn {
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-            color: white;
-        }
-        
-        .confirm-btn:disabled {
-            background: var(--text-secondary);
-            cursor: not-allowed;
-        }
-        
-        .cancel-btn {
-            background: rgba(74, 144, 226, 0.1);
-            color: var(--text-primary);
-        }
-        /* Success Toast */
-        
-        .success-toast {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--success);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            z-index: 1100;
-            animation: fadeInOut 3s forwards;
-        }
-        
-        @keyframes fadeInOut {
-            0% {
-                opacity: 0;
-                transform: translateX(-50%) translateY(20px);
-            }
-            10%,
-            90% {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0);
-            }
-            100% {
-                opacity: 0;
-                transform: translateX(-50%) translateY(20px);
-            }
-        }
-        /* Responsive Design */
-        
-        @media (max-width: 768px) {
-            .sidebar {
-                display: none;
-            }
-            .main-content {
-                margin-left: 0;
-                padding: 2rem 1rem;
-            }
-            .navbar {
-                padding: 1rem 2rem;
-            }
-            .nav-links {
-                display: none;
-            }
-            .pricing-grid {
-                grid-template-columns: 1fr;
-            }
-            .payment-grid {
-                flex-direction: column;
-                align-items: center;
-            }
-        }
-       
-        /* Responsive Profile */
-        @media (max-width: 768px) {
-            .profile-component {
-                padding: 0.5rem;
-                gap: 0.5rem;
-            }
-            .profile-name {
-                display: none;
-            }
-        }
-       
-/* Popup Modal Styles */
-.popup-modal {
-    display: none;
-    position: fixed;
-    z-index: 9999;
-    left: 0; top: 0; width: 100vw; height: 100vh;
-    background: rgba(0,0,0,0.5);
-    justify-content: center; align-items: center;
-    animation: fadeIn 0.3s;
-}
-.popup-content {
-    background: #fff;
-    border-radius: 16px;
-    padding: 32px 24px 24px 24px;
-    text-align: center;
-    position: relative;
-    min-width: 320px;
-    max-width: 90vw;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-    animation: popIn 0.5s cubic-bezier(.68,-0.55,.27,1.55);
-}
-.close-btn {
-    position: absolute;
-    top: 12px; right: 18px;
-    font-size: 28px;
-    color: #888;
-    cursor: pointer;
-    transition: color 0.2s;
-}
-.close-btn:hover { color: #f44336; }
-.popup-content h2 {
-    margin-top: 0;
-    color: #2d8cf0;
-    font-size: 2em;
-    font-weight: bold;
-    letter-spacing: 1px;
-}
-.popup-content p {
-    font-size: 1.1em;
-    margin: 18px 0 0 0;
-    color: #333;
-}
-.popup-content a {
-    color: #2d8cf0;
-    text-decoration: underline;
-}
-
-.popup-animation {
-  margin: 24px auto 0 auto;
-  width: 60px; height: 60px;
-  display: flex; align-items: center; justify-content: center;
-}
-.heart {
-  width: 48px; height: 48px;
-  fill: #ff4d6d;
-  animation: heartbeat 1s infinite;
-}
-@keyframes heartbeat {
-  0%, 100% { transform: scale(1); }
-  10%, 30% { transform: scale(1.2); }
-  20%, 40% { transform: scale(0.95); }
-  50% { transform: scale(1.1); }
-  60%, 80% { transform: scale(1); }
-}
-
-
-
-@keyframes popIn {
-    0% { transform: scale(0.7); opacity: 0; }
-    80% { transform: scale(1.05); opacity: 1; }
-    100% { transform: scale(1); }
-}
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-@keyframes spin {
-    0% { transform: rotate(0deg);}
-    100% { transform: rotate(360deg);}
-}
     </style>
 </head>
 
-<body>
-    <!-- 导航栏 -->
-    <nav class="navbar">
-        <div class="logo">
-            <a href="welcome_page">
-                <img src="../static/images/logo.jpg" alt="Lvxin Logo">
-            </a>
-        </div>
-
-        <div class="nav-links">
-            <a href="subscriptions" data-i18n="pricing">Pricing</a>
-            <a href="aboutus" data-i18n="about_us">About Us</a>
-            <a href="helpcenter" data-i18n="help_center">Help Center</a>
-        </div>
-        <div class="actions">
-            <select id="language-selector" class="form-control" style="background: var(--card-bg); color: var(--text-primary); border-color: var(--primary);">
-                <option value="en">English</option>
-                <option value="zh">中文</option>
+<body class="bg-slate-900">
+    <nav class="absolute top-0 left-0 right-0 z-20 flex items-center justify-between p-6">
+        <div></div>
+        <div class="relative">
+            <select id="language-selector" class="bg-white/10 text-white border border-white/20 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400">
+                <option value="zh" class="text-black">中文</option>
+                <option value="en" class="text-black">English</option>
             </select>
-            <button id="themeToggle" class="icon-btn">
-                <i class="fas fa-moon"></i>
-            </button>
-            <a href="profile" class="profile-component">
-                <img src="../static/images/profile.jpeg" class="profile-image" alt="Profile Picture">
-                <span class="profile-name">{{name}}</span>
-            </a>
         </div>
     </nav>
-
-    <!-- 侧边栏 -->
-    <nav class="sidebar">
-        <div class="nav-section">
-            <div class="nav-title" data-i18n="team_database">Team Database</div>
-            <a href="mydash" class="nav-item"><i class="fas fa-chart-bar"></i> <span data-i18n="dashboard">Dashboard</span></a>
-            <a href="upload_contract" class="nav-item"><i class="fas fa-upload"></i> <span data-i18n="upload_contract">Upload Contract</span></a>
-            <a href="history" class="nav-item"><i class="fas fa-history"></i> <span data-i18n="analysis_history">Analysis History</span></a>
-            <a href="analysis" class="nav-item"><i class="fas fa-file-alt"></i> <span data-i18n="document_analysis">Document Analysis</span></a>
-        </div>
-        <div class="nav-section">
-            <div class="nav-title" data-i18n="account">Account</div>
-            <a href="profile" class="nav-item"><i class="fas fa-user-circle"></i> <span data-i18n="user_profile">User Profile</span></a>
-            <a href="subscriptions" class="nav-item active"><i class="fas fa-gem"></i> <span data-i18n="subscriptions">Subscriptions</span></a>
-        </div>
-        <div class="nav-section">
-            <div class="nav-title" data-i18n="support">Support</div>
-            <a href="contactus" class="nav-item"><i class="fas fa-envelope"></i> <span data-i18n="contact_us">Contact Us</span></a>
-            <a href="helpcenter" class="nav-item"><i class="fas fa-question-circle"></i> <span data-i18n="faq">FAQ</span></a>
-            <a href="aboutus" class="nav-item"><i class="fas fa-info-circle"></i> <span data-i18n="about_us">About Us</span></a>
-            <a href="whats-new" class="nav-item"><i class="fas fa-bullhorn"></i> <span data-i18n="whats_new">What's New</span></a>
-        </div>
-    </nav>
-
-    <!-- 主要内容 -->
-    <main class="main-content">
-        <div class="dashboard-header">
-            <h1 data-i18n="subscriptions_header">Choose Your Plan</h1>
-            <p class="subtitle" data-i18n="subscriptions_subheader">Flexible pricing for teams of all sizes.</p>
-        </div>
-
-        <div class="pricing-grid">
-            <!-- Basic Plan -->
-            <div class="pricing-card">
-                <div class="plan-title" data-i18n="plan_basic_title">Basic Plan</div>
-                <div class="price"><span data-i18n="plan_basic_price">¥199</span><span data-i18n="plan_basic_period">/ month</span></div>
-                <ul class="features-list">
-                    <li><i class="fas fa-check-circle"></i> <span data-i18n="plan_basic_feature1">100 contract analyses</span></li>
-                    <li><i class="fas fa-check-circle"></i> <span data-i18n="plan_basic_feature2">Standard risk detection</span></li>
-                    <li><i class="fas fa-check-circle"></i> <span data-i18n="plan_basic_feature3">Email support</span></li>
-                    <li><i class="fas fa-check-circle"></i> <span data-i18n="plan_basic_feature4">5GB storage</span></li>
-                </ul>
-                <button class="btn-choose" data-i18n="choose_plan_btn">Choose Plan</button>
+    <div class="min-h-screen bg-gradient-to-b from-slate-900 via-gray-900 to-black relative overflow-hidden">
+      <!-- Subtle overlay for depth -->
+      <div class="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/60 pointer-events-none"></div>
+      
+      <!-- Ambient glow effects -->
+      <div class="absolute top-0 left-1/4 w-96 h-96 bg-purple-600/5 rounded-full blur-3xl"></div>
+      <div class="absolute top-1/4 right-1/4 w-80 h-80 bg-teal-600/5 rounded-full blur-3xl"></div>
+      
+      <div class="relative z-10">
+        <!-- Header -->
+        <div class="text-center py-16">
+          <h1 data-i18n="subscriptions_header" class="text-5xl font-bold text-white mb-12 tracking-tight">
+            Payment & pricing
+          </h1>
+          
+          <!-- Stats -->
+          <div class="flex justify-center space-x-20 mb-16">
+            <div class="text-center group">
+              <div class="text-3xl font-bold text-white mb-2 group-hover:text-purple-300 transition-colors duration-300">34,710,665</div>
+              <div class="text-sm text-gray-400 tracking-widest font-medium" data-i18n="stats_conversions">CONVERSIONS</div>
             </div>
-
-            <!-- Pro Plan -->
-            <div class="pricing-card highlight">
-                <div class="plan-title" data-i18n="plan_pro_title">Pro Plan</div>
-                <div class="price"><span data-i18n="plan_pro_price">¥499</span><span data-i18n="plan_pro_period">/ month</span></div>
-                <ul class="features-list">
-                    <li><i class="fas fa-check-circle"></i> <span data-i18n="plan_pro_feature1">Unlimited contract analyses</span></li>
-                    <li><i class="fas fa-check-circle"></i> <span data-i18n="plan_pro_feature2">Advanced AI risk detection</span></li>
-                    <li><i class="fas fa-check-circle"></i> <span data-i18n="plan_pro_feature3">Priority email & chat support</span></li>
-                    <li><i class="fas fa-check-circle"></i> <span data-i18n="plan_pro_feature4">50GB storage</span></li>
-                    <li><i class="fas fa-check-circle"></i> <span data-i18n="plan_pro_feature5">Team collaboration features</span></li>
-                </ul>
-                <button class="btn-choose" data-i18n="choose_plan_btn">Choose Plan</button>
+            <div class="text-center group">
+              <div class="text-3xl font-bold text-white mb-2 group-hover:text-purple-300 transition-colors duration-300">1,279,663</div>
+              <div class="text-sm text-gray-400 tracking-widest font-medium" data-i18n="stats_voices">VOICES TRAINED</div>
             </div>
-
-            <!-- Enterprise Plan -->
-            <div class="pricing-card">
-                <div class="plan-title" data-i18n="plan_enterprise_title">Enterprise Plan</div>
-                <div class="price"><span data-i18n="plan_enterprise_price">Contact Us</span></div>
-                <ul class="features-list">
-                    <li><i class="fas fa-check-circle"></i> <span data-i18n="plan_enterprise_feature1">Custom solutions for your business</span></li>
-                    <li><i class="fas fa-check-circle"></i> <span data-i18n="plan_enterprise_feature2">Dedicated account manager</span></li>
-                    <li><i class="fas fa-check-circle"></i> <span data-i18n="plan_enterprise_feature3">On-premise deployment option</span></li>
-                    <li><i class="fas fa-check-circle"></i> <span data-i18n="plan_enterprise_feature4">24/7 premium support</span></li>
-                    <li><i class="fas fa-check-circle"></i> <span data-i18n="plan_enterprise_feature5">API access</span></li>
-                </ul>
-                <button class="btn-choose" data-i18n="contact_sales_btn">Contact Sales</button>
+            <div class="text-center group">
+              <div class="text-3xl font-bold text-white mb-2 group-hover:text-purple-300 transition-colors duration-300">6,156,902</div>
+              <div class="text-sm text-gray-400 tracking-widest font-medium" data-i18n="stats_creators">KITS CREATORS</div>
             </div>
-        </div>
+          </div>
 
-        <div class="payment-methods">
-            <h2 data-i18n="payment_methods_title">Accepted Payment Methods</h2>
-            <div class="payment-grid">
-                <div class="payment-method" id="wechatPay">
-                    <img src="../static/images/we_chat.jpg" alt="WeChat Pay">
-                    <span data-i18n="wechat_pay">WeChat Pay</span>
+          <!-- Billing Toggle -->
+          <div class="flex justify-center mb-16">
+            <div id="billing-toggle" class="bg-black/40 backdrop-blur-sm border border-gray-800/50 rounded-full p-1.5 flex shadow-2xl">
+              <button data-period="monthly" class="px-8 py-3 rounded-full text-sm font-semibold transition-all duration-300 bg-gradient-to-r from-gray-700 to-gray-600 text-white shadow-lg">
+                <span data-i18n="monthly">MONTHLY BILLING</span>
+              </button>
+              <button data-period="annual" class="px-8 py-3 rounded-full text-sm font-semibold transition-all duration-300 text-gray-400 hover:text-white hover:bg-gray-800/50">
+                <span data-i18n="yearly">ANNUAL BILLING</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Pricing Cards -->
+          <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+              <!-- Plan 1: Convertor -->
+              <div class="relative group plan-card" data-plan="convertor" data-monthly-price="7.99" data-annual-price="95.88" data-monthly-original="9.99" data-annual-original="119.88" data-yearly-billed="$96 billed yearly">
+                <div class="bg-gradient-to-b from-gray-900/80 to-black/90 backdrop-blur-sm rounded-3xl p-8 h-full relative overflow-hidden border border-gray-800/30 shadow-2xl shadow-purple-500/10 group-hover:shadow-xl group-hover:border-gray-700/50 transition-all duration-500">
+                  <div class="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent rounded-3xl"></div>
+                  <div class="text-center mb-8 relative z-10">
+                    <h3 class="text-2xl font-bold text-white mb-6 tracking-wide" data-i18n="plan_basic_title">Convertor</h3>
+                    <div class="mb-3">
+                      <span class="text-5xl font-bold bg-gradient-to-r from-purple-400 via-purple-500 to-pink-500 bg-clip-text text-transparent price">$7.99</span>
+                      <span class="text-gray-500 line-through ml-3 text-lg original-price">$9.99 / month</span>
+                    </div>
+                    <div class="text-sm text-gray-400 font-medium yearly-price-text"></div>
+                  </div>
+                  <button class="plan-button w-full bg-gradient-to-r from-purple-500 via-purple-600 to-pink-500 shadow-lg shadow-purple-500/25 text-white font-bold py-4 rounded-2xl mb-8 hover:scale-105 hover:shadow-2xl transition-all duration-300 tracking-wide" data-i18n="go_annual_btn">GO ANNUAL</button>
+                  <div class="mb-8 relative z-10">
+                    <h4 class="text-gray-400 text-sm font-bold mb-6 uppercase tracking-widest" data-i18n="usage_title">Usage</h4>
+                    <div class="space-y-4">
+                      <div class="flex justify-between items-center py-2"><span class="text-gray-200 font-medium" data-i18n="voice_slots">Custom voice slots</span><span class="text-white font-bold text-lg">2</span></div>
+                      <div class="flex justify-between items-center py-2">
+                        <div class="flex items-center"><span class="text-gray-200 font-medium" data-i18n="download_minutes">Download minutes</span><i class="fas fa-info-circle w-4 h-4 text-gray-500 ml-2"></i></div>
+                        <div class="flex items-center"><span class="text-white font-bold text-lg">30/mo</span></div>
+                      </div>
+                      <div class="flex justify-between items-center py-2"><span class="text-gray-200 font-medium" data-i18n="conversions">Conversions</span><span class="text-white font-bold text-lg" data-i18n="unlimited">Unlimited</span></div>
+                    </div>
+                  </div>
+                  <div class="mb-8 relative z-10">
+                    <h4 class="text-gray-400 text-sm font-bold mb-6 uppercase tracking-widest" data-i18n="features">Features</h4>
+                    <div class="space-y-4">
+                      <div class="flex items-start"><i class="fas fa-check w-5 h-5 text-emerald-400 mt-0.5 mr-4 flex-shrink-0"></i><span class="text-gray-300 text-sm leading-relaxed" data-i18n="plan_basic_feature1"></span></div>
+                      <div class="flex items-start"><i class="fas fa-check w-5 h-5 text-emerald-400 mt-0.5 mr-4 flex-shrink-0"></i><span class="text-gray-300 text-sm leading-relaxed" data-i18n="plan_basic_feature2"></span></div>
+                      <div class="flex items-start"><i class="fas fa-check w-5 h-5 text-emerald-400 mt-0.5 mr-4 flex-shrink-0"></i><span class="text-gray-300 text-sm leading-relaxed" data-i18n="plan_basic_feature3"></span></div>
+                    </div>
+                  </div>
+                  <button class="w-full border border-gray-700/50 text-gray-300 py-3 rounded-xl hover:bg-gray-800/30 hover:border-gray-600/50 transition-all duration-300 font-medium tracking-wide" data-i18n="view_all_features_btn">VIEW ALL FEATURES</button>
                 </div>
-                <div class="payment-method" id="aliPay">
-                    <img src="../static/images/OIP (1).webp" alt="Alipay">
-                    <span data-i18n="alipay">Alipay</span>
-                </div>
-            </div>
-        </div>
-    </main>
-    <div class="subscription-popup-overlay" id="subscriptionPopup">
-  <div class="subscription-popup">
-    <button class="popup-close" id="closePopup" aria-label="Close">&times;</button>
-    <div class="popup-content">
-      <i class="fas fa-star"></i>
-      <h2>Unlock Premium Features!</h2>
-      <p>
-        Subscribe now to enjoy exclusive tools, priority support, and maximize your LVXIN experience.<br>
-        <strong>Choose your perfect plan below!</strong>
-      </p>
-      <button class="popup-cta" onclick="document.getElementById('subscriptionPopup').style.display='none'">
-        View Plans
-      </button>
-    </div>
-  </div>
-</div>
-<div id="subscribe-popup" class="popup-modal">
-    <div class="popup-content animated-pop">
-        <span class="close-btn">&times;</span>
-        <h2>🎉 立即联系我们！</h2>
-        <p>
-            请发送邮件至 <a href="mailto:info@lvxlaw.com">info@lvxlaw.com</a><br>
-            并注明您想订阅的套餐和您的账户邮箱。<br>
-            我们会尽快与您联系，开启您的专属服务体验！
-        </p>
-        <div class="popup-animation">
-        <svg viewBox="0 0 32 29.6" class="heart">
-            <path d="M23.6,0c-2.7,0-5.1,1.3-6.6,3.3C15.5,1.3,13.1,0,10.4,0C4.7,0,0,4.7,0,10.4
-            c0,6.1,5.5,11.1,13.8,18.3l2.2,2l2.2-2C26.5,21.5,32,16.5,32,10.4C32,4.7,27.3,0,23.6,0z"/>
-        </svg>
-        </div>
-    </div>
-</div>
-<script>
-  // Show popup on page load
-  window.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('subscriptionPopup').style.display = 'flex';
-  });
+              </div>
 
-  // Close popup on button click
-  document.getElementById('closePopup').onclick = function() {
-    document.getElementById('subscriptionPopup').style.display = 'none';
-  };
-</script>
-</body>
+              <!-- Plan 2: Creator -->
+              <div class="relative group plan-card" data-plan="creator" data-monthly-price="19.99" data-annual-price="239.88" data-monthly-original="24.99" data-annual-original="299.88" data-yearly-billed="$240 billed yearly">
+                <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20">
+                  <span class="bg-gradient-to-r from-teal-400 to-cyan-400 text-black px-4 py-2 rounded-full text-xs font-bold tracking-wide shadow-lg" data-i18n="most_popular">RECOMMENDED</span>
+                </div>
+                <div class="bg-gradient-to-b from-gray-900/80 to-black/90 backdrop-blur-sm rounded-3xl p-8 h-full relative overflow-hidden border border-gray-800/30 shadow-2xl shadow-teal-500/15 group-hover:shadow-xl group-hover:border-gray-700/50 transition-all duration-500">
+                  <div class="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent rounded-3xl"></div>
+                  <div class="text-center mb-8 relative z-10">
+                    <h3 class="text-2xl font-bold text-white mb-6 tracking-wide" data-i18n="plan_pro_title">Creator</h3>
+                    <div class="mb-3">
+                      <span class="text-5xl font-bold bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500 bg-clip-text text-transparent price">$19.99</span>
+                      <span class="text-gray-500 line-through ml-3 text-lg original-price">$24.99 / month</span>
+                    </div>
+                    <div class="text-sm text-gray-400 font-medium yearly-price-text"></div>
+                  </div>
+                  <button class="plan-button w-full bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-500 shadow-lg shadow-teal-500/25 text-white font-bold py-4 rounded-2xl mb-8 hover:scale-105 hover:shadow-2xl transition-all duration-300 tracking-wide" data-i18n="upgrade_btn">UPGRADE</button>
+                  <div class="mb-8 relative z-10">
+                    <h4 class="text-gray-400 text-sm font-bold mb-6 uppercase tracking-widest" data-i18n="usage_title">Usage</h4>
+                    <div class="space-y-4">
+                      <div class="flex justify-between items-center py-2"><span class="text-gray-200 font-medium" data-i18n="voice_slots">Custom voice slots</span><span class="text-white font-bold text-lg">5</span></div>
+                      <div class="flex justify-between items-center py-2">
+                         <div class="flex items-center"><span class="text-gray-200 font-medium" data-i18n="download_minutes">Download minutes</span><i class="fas fa-info-circle w-4 h-4 text-gray-500 ml-2"></i></div>
+                        <div class="flex items-center"><span class="text-white font-bold text-lg">75/mo</span></div>
+                      </div>
+                      <div class="flex justify-between items-center py-2"><span class="text-gray-200 font-medium" data-i18n="conversions">Conversions</span><span class="text-white font-bold text-lg" data-i18n="unlimited">Unlimited</span></div>
+                    </div>
+                  </div>
+                  <div class="mb-8 relative z-10">
+                    <h4 class="text-gray-400 text-sm font-bold mb-6 uppercase tracking-widest" data-i18n="features">Features</h4>
+                    <div class="space-y-4">
+                        <div class="flex items-start"><i class="fas fa-check w-5 h-5 text-emerald-400 mt-0.5 mr-4 flex-shrink-0"></i><span class="text-gray-300 text-sm leading-relaxed" data-i18n="plan_pro_feature1"></span></div>
+                        <div class="flex items-start"><i class="fas fa-check w-5 h-5 text-emerald-400 mt-0.5 mr-4 flex-shrink-0"></i><span class="text-gray-300 text-sm leading-relaxed" data-i18n="plan_pro_feature2"></span></div>
+                        <div class="flex items-start"><i class="fas fa-check w-5 h-5 text-emerald-400 mt-0.5 mr-4 flex-shrink-0"></i><span class="text-gray-300 text-sm leading-relaxed" data-i18n="plan_pro_feature3"></span></div>
+                    </div>
+                  </div>
+                  <button class="w-full border border-gray-700/50 text-gray-300 py-3 rounded-xl hover:bg-gray-800/30 hover:border-gray-600/50 transition-all duration-300 font-medium tracking-wide" data-i18n="view_all_features_btn">VIEW ALL FEATURES</button>
+                </div>
+              </div>
+
+              <!-- Plan 3: Composer -->
+              <div class="relative group plan-card" data-plan="composer" data-monthly-price="47.99" data-annual-price="575.88" data-monthly-original="59.99" data-annual-original="719.88" data-yearly-billed="$576 billed yearly">
+                <div class="bg-gradient-to-b from-gray-900/80 to-black/90 backdrop-blur-sm rounded-3xl p-8 h-full relative overflow-hidden border border-gray-800/30 shadow-2xl shadow-green-500/10 group-hover:shadow-xl group-hover:border-gray-700/50 transition-all duration-500">
+                  <div class="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent rounded-3xl"></div>
+                  <div class="text-center mb-8 relative z-10">
+                    <h3 class="text-2xl font-bold text-white mb-6 tracking-wide" data-i18n="plan_enterprise_title">Composer</h3>
+                    <div class="mb-3">
+                      <span class="text-5xl font-bold bg-gradient-to-r from-green-400 via-emerald-500 to-green-600 bg-clip-text text-transparent price">$47.99</span>
+                      <span class="text-gray-500 line-through ml-3 text-lg original-price">$59.99 / month</span>
+                    </div>
+                    <div class="text-sm text-gray-400 font-medium yearly-price-text"></div>
+                  </div>
+                  <button class="plan-button w-full bg-gradient-to-r from-green-500 via-emerald-600 to-green-700 shadow-lg shadow-green-500/25 text-white font-bold py-4 rounded-2xl mb-8 hover:scale-105 hover:shadow-2xl transition-all duration-300 tracking-wide" data-i18n="upgrade_btn">UPGRADE</button>
+                  <div class="mb-8 relative z-10">
+                    <h4 class="text-gray-400 text-sm font-bold mb-6 uppercase tracking-widest" data-i18n="usage_title">Usage</h4>
+                    <div class="space-y-4">
+                      <div class="flex justify-between items-center py-2"><span class="text-gray-200 font-medium" data-i18n="voice_slots">Custom voice slots</span><span class="text-white font-bold text-lg">12</span></div>
+                      <div class="flex justify-between items-center py-2">
+                        <div class="flex items-center"><span class="text-gray-200 font-medium" data-i18n="download_minutes">Download minutes</span><i class="fas fa-info-circle w-4 h-4 text-gray-500 ml-2"></i></div>
+                        <div class="flex items-center"><span class="text-white font-bold text-lg" data-i18n="unlimited">Unlimited</span><span class="bg-gradient-to-r from-gray-700 to-gray-600 text-gray-300 text-xs px-3 py-1 rounded-full ml-3 font-semibold" data-i18n="beta">BETA</span></div>
+                      </div>
+                      <div class="flex justify-between items-center py-2"><span class="text-gray-200 font-medium" data-i18n="conversions">Conversions</span><span class="text-white font-bold text-lg" data-i18n="unlimited">Unlimited</span></div>
+                    </div>
+                  </div>
+                  <div class="mb-8 relative z-10">
+                    <h4 class="text-gray-400 text-sm font-bold mb-6 uppercase tracking-widest" data-i18n="features">Features</h4>
+                    <div class="space-y-4">
+                        <div class="flex items-start"><i class="fas fa-check w-5 h-5 text-emerald-400 mt-0.5 mr-4 flex-shrink-0"></i><span class="text-gray-300 text-sm leading-relaxed" data-i18n="plan_enterprise_feature1"></span></div>
+                        <div class="flex items-start"><i class="fas fa-check w-5 h-5 text-emerald-400 mt-0.5 mr-4 flex-shrink-0"></i><span class="text-gray-300 text-sm leading-relaxed" data-i18n="plan_enterprise_feature2"></span></div>
+                        <div class="flex items-start"><i class="fas fa-check w-5 h-5 text-emerald-400 mt-0.5 mr-4 flex-shrink-0"></i><span class="text-gray-300 text-sm leading-relaxed" data-i18n="plan_enterprise_feature3"></span></div>
+                    </div>
+                  </div>
+                  <button class="w-full border border-gray-700/50 text-gray-300 py-3 rounded-xl hover:bg-gray-800/30 hover:border-gray-600/50 transition-all duration-300 font-medium tracking-wide" data-i18n="view_all_features_btn">VIEW ALL FEATURES</button>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Enterprise Section -->
+            <div class="bg-gradient-to-r from-black/60 via-gray-900/40 to-black/60 backdrop-blur-sm rounded-3xl p-10 flex items-center justify-between border border-gray-800/30 shadow-2xl">
+              <div class="flex items-center">
+                <div class="bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 p-4 rounded-2xl mr-8 shadow-lg shadow-blue-600/20">
+                  <div class="w-10 h-10 bg-white/20 rounded-lg backdrop-blur-sm"></div>
+                </div>
+                <div>
+                  <h3 class="text-3xl font-bold text-white mb-4 tracking-wide" data-i18n="enterprise_section_title">Enterprise</h3>
+                  <p class="text-gray-300 max-w-2xl leading-relaxed text-lg" data-i18n="enterprise_section_description">
+                    Enterprise plans come with direct support and customization for your specific needs. 
+                    This includes personalized model training, custom voice slots, admin access to hidden 
+                    and upcoming features, direct support and more.
+                  </p>
+                </div>
+              </div>
+              <div class="ml-10 flex-shrink-0">
+                <button class="bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 hover:from-gray-600 hover:via-gray-500 hover:to-gray-600 text-white px-10 py-4 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl tracking-wide mb-6" data-i18n="get_in_touch_btn">
+                  GET IN TOUCH
+                </button>
+                <div class="space-y-3">
+                  <div class="flex items-center text-sm"><i class="fas fa-check w-4 h-4 text-emerald-400 mr-3"></i><span class="text-gray-300 font-medium" data-i18n="enterprise_feature1">Custom Number of Training Slots</span></div>
+                  <div class="flex items-center text-sm"><i class="fas fa-check w-4 h-4 text-emerald-400 mr-3"></i><span class="text-gray-300 font-medium" data-i18n="enterprise_feature2">Personalized Voice Training</span></div>
+                  <div class="flex items-center text-sm"><i class="fas fa-check w-4 h-4 text-emerald-400 mr-3"></i><span class="text-gray-300 font-medium" data-i18n="enterprise_feature3">Direct support to ensure success</span></div>
+                  <div class="flex items-center text-sm"><i class="fas fa-check w-4 h-4 text-emerald-400 mr-3"></i><span class="text-gray-300 font-medium" data-i18n="enterprise_feature4">Access to hidden and upcoming features</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
     <script>
-        // Theme Toggle
-        const themeToggle = document.getElementById('themeToggle');
-        let isDarkMode = localStorage.getItem('darkMode') === 'true';
+    document.addEventListener('DOMContentLoaded', () => {
+        const billingToggle = document.getElementById('billing-toggle');
+        const planCards = document.querySelectorAll('.plan-card');
+        let currentPeriod = 'monthly';
 
-        function toggleTheme() {
-            isDarkMode = !isDarkMode;
-            document.body.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
-            themeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-            localStorage.setItem('darkMode', isDarkMode);
-        }
+        function updatePrices() {
+            const isMonthly = currentPeriod === 'monthly';
 
-        themeToggle.addEventListener('click', toggleTheme);
-        document.body.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
-        themeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-
-        // Payment Method Selection
-        document.querySelectorAll('.payment-method').forEach(method => {
-            method.addEventListener('click', function() {
-                document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
-                this.classList.add('selected');
+            billingToggle.querySelectorAll('button').forEach(button => {
+                if (button.dataset.period === currentPeriod) {
+                    button.classList.add('bg-gradient-to-r', 'from-gray-700', 'to-gray-600', 'text-white', 'shadow-lg');
+                    button.classList.remove('text-gray-400', 'hover:text-white', 'hover:bg-gray-800/50');
+                } else {
+                    button.classList.remove('bg-gradient-to-r', 'from-gray-700', 'to-gray-600', 'text-white', 'shadow-lg');
+                    button.classList.add('text-gray-400', 'hover:text-white', 'hover:bg-gray-800/50');
+                }
             });
-        });
 
-        // Toast Notification System
-        function showMessage(message) {
-            const toast = document.createElement('div');
-            toast.className = 'success-toast';
-            toast.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
+            planCards.forEach(card => {
+                const priceEl = card.querySelector('.price');
+                const originalPriceEl = card.querySelector('.original-price');
+                const yearlyPriceTextEl = card.querySelector('.yearly-price-text');
+                const buttonEl = card.querySelector('.plan-button');
+
+                const monthlyPrice = card.dataset.monthlyPrice;
+                const annualPrice = card.dataset.annualPrice;
+                const monthlyOriginal = card.dataset.monthlyOriginal;
+                const annualOriginal = card.dataset.annualOriginal;
+                const yearlyBilledText = card.dataset.yearlyBilled;
+
+                if (isMonthly) {
+                    priceEl.textContent = `$${monthlyPrice}`;
+                    originalPriceEl.textContent = `$${monthlyOriginal} / month`;
+                    yearlyPriceTextEl.textContent = '';
+                    if (card.dataset.plan === 'convertor') {
+                        buttonEl.setAttribute('data-i18n', 'go_annual_btn');
+                    } else {
+                        buttonEl.setAttribute('data-i18n', 'upgrade_btn');
+                    }
+                } else {
+                    priceEl.textContent = `$${(annualPrice / 12).toFixed(2)}`;
+                    originalPriceEl.textContent = `$${(annualOriginal / 12).toFixed(2)} / month`;
+                    yearlyPriceTextEl.textContent = yearlyBilledText;
+                    buttonEl.setAttribute('data-i18n', 'upgrade_btn');
+                }
+            });
         }
 
-       
-    </script>
-    <script>
-    document.querySelectorAll('.btn-choose').forEach(function(btn) {
-        btn.addEventListener('click', function(e) {
-            document.getElementById('subscribe-popup').style.display = 'flex';
+        function updateAllContent() {
+            updatePrices();
+            if (window.updateI18nContent) {
+                window.updateI18nContent();
+            }
+        }
+
+        // Initial setup
+        updateAllContent();
+
+        // Listen for language changes to update prices and translations
+        if (window.i18next) {
+            window.i18next.on('languageChanged', (lng) => {
+                updateAllContent();
+            });
+        }
+
+        billingToggle.addEventListener('click', (e) => {
+            const button = e.target.closest('button');
+            if (button && button.dataset.period) {
+                currentPeriod = button.dataset.period;
+                updateAllContent();
+            }
         });
     });
-    document.querySelector('.popup-modal .close-btn').onclick = function() {
-        document.getElementById('subscribe-popup').style.display = 'none';
-    };
-    window.onclick = function(event) {
-        var modal = document.getElementById('subscribe-popup');
-        if (event.target === modal) {
-            modal.style.display = 'none';
-        }
-    };
-</script>
+    </script>
 </body>
-
 </html>

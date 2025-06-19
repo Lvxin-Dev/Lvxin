@@ -41,8 +41,8 @@ def oss_upload(f_loc: str, f_name: str) -> str:
         return _mock_oss_upload(f_loc, f_name)
 
     # Set environment variables programmatically
-    os.environ['OSS_ACCESS_KEY_ID'] = os.getenv("access_id")
-    os.environ['OSS_ACCESS_KEY_SECRET'] = os.getenv("sec_key")
+    os.environ['OSS_ACCESS_KEY_ID'] = os.getenv("ALIBABA_CLOUD_ACCESS_KEY_ID")
+    os.environ['OSS_ACCESS_KEY_SECRET'] = os.getenv("ALIBABA_CLOUD_ACCESS_KEY_SECRET")
 
     auth = oss2.ProviderAuthV4(EnvironmentVariableCredentialsProvider())
     endpoint = "https://oss-cn-hangzhou.aliyuncs.com"
@@ -65,8 +65,8 @@ def api_dep(ur: str, file_name: str, output_filename: str):
 
     logger.info(f"Uploading for analysis: {file_name} from {ur}")
     
-    access_key_id = os.getenv("access_id")
-    access_key_secret = os.getenv("sec_key")
+    access_key_id = os.getenv("ALIBABA_CLOUD_ACCESS_KEY_ID")
+    access_key_secret = os.getenv("ALIBABA_CLOUD_ACCESS_KEY_SECRET")
     workspace_id = os.getenv("work_id")
 
     file_data = upload_message(access_key_id, access_key_secret, workspace_id, ur, file_name)
