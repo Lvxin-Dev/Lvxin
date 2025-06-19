@@ -17,7 +17,7 @@ if not os.path.exists(USERS_DIR):
 
 def create_user_in_db(
     fullname: str,
-    email: str,
+    email: Optional[str],
     password: str,
     phone: str,
     username: str
@@ -81,7 +81,7 @@ def delete_user_folder(user_id: str, username: str) -> bool:
         print(f"User folder {user_folder} does not exist")
         return False
 
-def save_user_data(user_id: str, username: str, full_name: str, email: str, file_url: Optional[str] = None, filename: Optional[str] = None, api_url: Optional[str] = None):
+def save_user_data(user_id: str, username: str, full_name: str, email: Optional[str], file_url: Optional[str] = None, filename: Optional[str] = None, api_url: Optional[str] = None):
     """Save user data to their own JSON file"""
     user_folder = create_user_folder(user_id, username)
     file_name = f"{user_id}_{username}.json"
@@ -135,6 +135,8 @@ def reach_json(session_data: SessionData):
 
     with open(file_path, 'r') as f:
         user_data = json.load(f)
+        # Ensure email key exists to prevent errors in other parts of the app
+        user_data.setdefault('email', None)
     return user_data
 
 def update_user_login_time(user_id: str, username: str):

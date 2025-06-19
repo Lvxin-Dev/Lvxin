@@ -358,46 +358,34 @@
             </div>
 
             <div id="phone-form-container" class="hidden">
-                 <form id="phone-signup-form">
-                    <div class="form-group">
-                        <label for="phone-fullname">Full Name</label>
-                        <input type="text" id="phone-fullname" name="fullname" required>
+                <form id="phone-signup-form" method="POST">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="username" name="username" data-i18n="[placeholder]signup.username" placeholder="Username" required />
                     </div>
-                    <div class="form-group">
-                        <label for="phone-email">Email</label>
-                        <input type="email" id="phone-email" name="email" required>
+                    <div class="input-group">
+                        <i class="fas fa-key"></i>
+                        <input type="password" id="password" name="password" data-i18n="[placeholder]signup.password" placeholder="Password" required />
                     </div>
-                    <div class="form-group">
-                        <label for="phone-username">Username</label>
-                        <input type="text" id="phone-username" name="username" required>
+                    <div class="input-group phone-group">
+                        <i class="fas fa-phone"></i>
+                        <input type="tel" id="phone-number" name="phone" data-i18n="[placeholder]signup.phone" placeholder="Phone Number" required />
+                        <button type="button" id="send-code-btn" data-i18n="signup.sendCode">Send Code</button>
                     </div>
-                    <div class="form-group">
-                        <label for="phone-number">Phone Number</label>
-                        <input type="tel" id="phone-number" name="phone" required placeholder="+1 (555) 555-5555">
-                        <div id="phone-feedback" class="feedback"></div>
-                    </div>
-                    <div class="form-group">
-                        <button type="button" id="send-code-btn" class="submit-btn">Send Code</button>
-                    </div>
+                    <div id="phone-feedback" class="feedback"></div>
                     <div id="otp-section" class="hidden">
-                        <div class="form-group">
-                            <label for="otp">Verification Code</label>
-                            <div class="otp-container">
-                                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]">
-                                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]">
-                                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]">
-                                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]">
-                                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]">
-                                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]">
-                            </div>
-                            <div id="otp-feedback" class="feedback"></div>
+                        <p data-i18n="signup.otpPrompt" class="description">Enter the 6-digit code sent to your phone.</p>
+                        <div class="otp-inputs">
+                            <input type="text" class="otp-input" maxlength="1" />
+                            <input type="text" class="otp-input" maxlength="1" />
+                            <input type="text" class="otp-input" maxlength="1" />
+                            <input type="text" class="otp-input" maxlength="1" />
+                            <input type="text" class="otp-input" maxlength="1" />
+                            <input type="text" class="otp-input" maxlength="1" />
                         </div>
-                        <div class="form-group">
-                           <label for="phone-password">Password</label>
-                           <input type="password" id="phone-password" name="password" required>
-                        </div>
-                        <button type="submit" class="submit-btn">Sign Up</button>
+                        <div id="otp-feedback" class="feedback"></div>
                     </div>
+                    <button data-i18n="signup.button" type="submit" class="submit-btn">Sign Up</button>
                 </form>
             </div>
 

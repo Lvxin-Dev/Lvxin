@@ -2,14 +2,14 @@ import random
 import os
 import json
 import logging
-from core.redis import get_redis_connection
+from core.redis import redis_client
 from core.sms import sms_client
 
 logger = logging.getLogger(__name__)
 
 class PhoneVerificationService:
     def __init__(self):
-        self.redis = get_redis_connection()
+        self.redis = redis_client
         self.sign_name = os.environ.get("ALIBABA_CLOUD_SMS_SIGN_NAME")
         self.template_code = os.environ.get("ALIBABA_CLOUD_SMS_VERIFICATION_TEMPLATE_CODE")
 
@@ -27,9 +27,7 @@ class PhoneVerificationService:
         """
         otp = self._generate_otp()
         
-        # Store OTP in Redis
-        # Key: verification:13800138000, Value: 123456
-        # TTL: 300 seconds (5 minutes)
+        # Store OTP in Redis with a 5-minute expiry
         await self.redis.set(f"verification:{phone_number}", otp, ex=300)
 
         # Send SMS
@@ -56,8 +54,8 @@ class PhoneVerificationService:
         """
         stored_code = await self.redis.get(f"verification:{phone_number}")
         if stored_code and stored_code.decode('utf-8') == code:
-            # Optional: delete the code after successful verification
-            # await self.redis.delete(f"verification:{phone_number}")
+            # On successful verification, delete the code to prevent reuse
+            await self.redis.delete(f"verification:{phone_number}")
             return True
         return False
 
