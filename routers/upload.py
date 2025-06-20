@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, File, UploadFile, Form, Depends, HTTPException, Body
+from fastapi import APIRouter, Request, File, UploadFile, Form, Depends, HTTPException, Body, Response
 from typing import Optional, Dict
 from uuid import UUID, uuid4
 import os
@@ -7,6 +7,7 @@ import logging
 from datetime import datetime, timedelta
 import psycopg2.extras
 import shutil
+import urllib.parse
 
 from core.database import get_db_connection, release_db_connection
 from core.security import cookie, verifier, SessionData
@@ -333,3 +334,46 @@ async def finish_upload(
                 logger.warning(f"Failed to clean up temporary directory {chunk_dir} for upload {upload_id}: {e}")
 
     return {"message": "File uploaded and analysis started successfully.", "filename": record["file_name"]}
+
+# --- Anonymous Upload for Login Flow ---
+@router.post("/upload/anonymous", status_code=200, tags=["Uploads"])
+async def anonymous_upload_for_login(response: Response, file: UploadFile = File(...)):
+    """
+    Handles anonymous file uploads for the 'upload-then-login' flow.
+    Temporarily stores the file and sets a cookie to retrieve it after login.
+    """
+    try:
+        # Generate a secure, unique filename for the temporary file
+        temp_file_id = uuid4().hex
+        file_extension = os.path.splitext(file.filename)[1]
+        temp_filename = f"{temp_file_id}{file_extension}"
+        temp_filepath = os.path.join(TEMP_UPLOAD_DIR, temp_filename)
+
+        # Save the file asynchronously
+        async with aiofiles.open(temp_filepath, "wb") as f:
+            content = await file.read()
+            await f.write(content)
+
+        # Set a secure cookie with the temporary file info
+        cookie_max_age = 3600  # 1 hour
+        response.set_cookie(
+            key="temp_file_id",
+            value=temp_file_id,
+            max_age=cookie_max_age,
+            httponly=True,
+            samesite="lax"
+        )
+        safe_original_filename = urllib.parse.quote(file.filename)
+        response.set_cookie(
+            key="temp_file_original_name",
+            value=safe_original_filename,
+            max_age=cookie_max_age,
+            httponly=True,
+            samesite="lax"
+        )
+
+        return {"detail": "File uploaded successfully. Please log in to continue."}
+
+    except Exception as e:
+        logger.error(f"Anonymous upload failed: {e}")
+        raise HTTPException(status_code=500, detail="File upload failed.")

@@ -79,93 +79,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function handleUpload(e) {
-        analyzeBtn.addEventListener('click', async () => {
-            if (!currentFile) {
-                alert("Please select a file to upload.");
-                return;
-            }
-            
-            // Check if user is logged in by trying to access a protected endpoint
-            let isAuthenticated = false;
-            try {
-                const response = await fetch('/api/auth/check', { credentials: 'include' });
-                isAuthenticated = response.ok;
-            } catch (error) {
-                console.error('Error checking authentication status:', error);
-                isAuthenticated = false;
-            }
-            
-            if (!isAuthenticated) {
-                // Use the anonymous upload flow
-                await handleAnonymousUpload();
-            } else {
-                // Use the regular authenticated upload flow
-                startOrResumeUpload();
-            }
-
-            if (!uploadId) {
-                await initiateUpload();
-            }
-            uploadChunks();
-        });
-    }
-
-    async function handleAnonymousUpload() {
-        try {
-            const formData = new FormData();
-            formData.append('file', currentFile);
-            
-            // Show upload progress
-            statusText.textContent = 'Uploading file...';
-            progressContainer.style.display = 'block';
-            
-            const response = await fetch('/upload/anonymous', {
-                method: 'POST',
-                body: formData,
-                credentials: 'include'  // Important for cookies
-            });
-            
-            if (!response.ok) {
-                throw new Error(`Upload failed with status: ${response.status}`);
-            }
-            
-            const result = await response.json();
-            
-            if (result.is_anonymous) {
-                // Show success message and redirect to login
-                statusText.textContent = 'File uploaded successfully! Redirecting to login...';
-                // Redirect to login with a return URL to the upload page
-                setTimeout(() => {
-                    window.location.href = `/signin?next=/upload_contract&temp_file_id=${result.temp_file_id}`;
-                }, 2000);
-            } else {
-                // Shouldn't happen, but handle just in case
-                window.location.href = `/analysis?filename=${encodeURIComponent(result.filename)}`;
-            }
-        } catch (error) {
-            console.error('Anonymous upload error:', error);
-            statusText.textContent = 'Upload failed. Please try again or log in first.';
-            resetUploadState();
+        e.preventDefault();
+        if (!currentFile) {
+            alert('Please select a file to upload.');
+            return;
         }
-    }
 
-    async function startOrResumeUpload() {
-        try {
-            const formData = new FormData();
-            formData.append('file', currentFile);
-            const response = await fetch('/uploads/initiate', { method: 'POST', body: formData });
-            const data = await response.json();
-            uploadId = data.upload_id;
-            uploadedSize = 0; // A new upload starts at 0
-            currentFile = file;
-
-            statusText.textContent = 'Upload initiated. Starting...';
-            uploadChunks();
-        } catch (error) {
-            console.error('Initiate Upload Error:', error);
-            statusText.textContent = 'Error: Could not start upload.';
-            resetUploadState();
+        if (!uploadId) {
+            await initiateUpload();
         }
+        uploadChunks();
     }
 
     async function initiateUpload() {

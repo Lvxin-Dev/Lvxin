@@ -9,7 +9,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from uuid import UUID
 from dotenv import load_dotenv
 
-from routers import auth, upload, chat, auth_check
+from routers import auth, upload, chat
 from core.security import cookie, SessionData, backend, optional_cookie
 from utils import (
     root_page,
@@ -59,7 +59,6 @@ app.add_middleware(SessionMiddleware, secret_key=secret_key)
 app.include_router(auth.router)
 app.include_router(upload.router)
 app.include_router(chat.router)
-app.include_router(auth_check.router)
 
 # --- Static Files ---
 app.mount("/static", StaticFiles(directory="static"), name="static")
