@@ -19,22 +19,31 @@ def create_user_in_db(
     fullname: str,
     email: Optional[str],
     password: str,
-    phone: str,
-    username: str
+    phone: Optional[str],
+    username: str,
+    account_type: str = 'individual',
+    company_id: Optional[str] = None
 ) -> Optional[dict]:
     """Create a new user in the database."""
     conn = get_db_connection()
     cur = conn.cursor()
     try:
-        cur.execute("SELECT email FROM users WHERE email = %s OR username = %s OR phone = %s", (email, username, phone))
+        # Build the query dynamically to handle optional phone numbers
+        query = "SELECT email FROM users WHERE email = %s OR username = %s"
+        params = [email, username]
+        if phone:
+            query += " OR phone = %s"
+            params.append(phone)
+            
+        cur.execute(query, tuple(params))
         if cur.fetchone():
             return None  # User already exists
 
         user_id = str(uuid4())
         
         cur.execute(
-            "INSERT INTO users (user_id, full_name, email, password, phone, username) VALUES (%s, %s, %s, %s, %s, %s) RETURNING user_id, username, email, full_name",
-            (user_id, fullname, email, password, phone, username),
+            "INSERT INTO users (user_id, full_name, email, password, phone, username, account_type, company_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING user_id, username, email, full_name, account_type, company_id",
+            (user_id, fullname, email, password, phone, username, account_type, company_id),
         )
         new_user = cur.fetchone()
         conn.commit()
@@ -44,12 +53,44 @@ def create_user_in_db(
                 "user_id": new_user[0],
                 "username": new_user[1],
                 "email": new_user[2],
-                "full_name": new_user[3]
+                "full_name": new_user[3],
+                "account_type": new_user[4],
+                "company_id": new_user[5]
             }
         return None
     except pg.Error as e:
         conn.rollback()
         logger.error(f"Database error during user creation: {e}")
+        raise
+    finally:
+        cur.close()
+        release_db_connection(conn)
+
+def create_company_in_db(name: str, license_num: Optional[str]) -> Optional[dict]:
+    """Create a new company in the database."""
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute("SELECT name FROM companies WHERE name = %s", (name,))
+        if cur.fetchone():
+            return None # Company already exists
+        
+        comp_id = str(uuid4())
+        cur.execute(
+            "INSERT INTO companies (comp_id, name, license) VALUES (%s, %s, %s) RETURNING comp_id, name",
+            (comp_id, name, license_num)
+        )
+        new_company = cur.fetchone()
+        conn.commit()
+        if new_company:
+            return {
+                "comp_id": new_company[0],
+                "name": new_company[1]
+            }
+        return None
+    except pg.Error as e:
+        conn.rollback()
+        logger.error(f"Database error during company creation: {e}")
         raise
     finally:
         cur.close()

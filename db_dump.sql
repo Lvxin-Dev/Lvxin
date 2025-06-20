@@ -17,6 +17,16 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
+-- Name: account_type; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.account_type AS ENUM (
+    'individual',
+    'company_admin'
+);
+
+
+--
 -- Name: upload_status; Type: TYPE; Schema: public; Owner: postgres
 --
 
@@ -101,7 +111,9 @@ CREATE TABLE public.users (
     username text,
     wechat_openid text,
     wechat_unionid text,
-    avatar_url text
+    avatar_url text,
+    account_type public.account_type DEFAULT 'individual'::public.account_type NOT NULL,
+    company_id uuid
 );
 
 
@@ -221,6 +233,38 @@ ALTER TABLE ONLY public.files
 --
 
 CREATE INDEX idx_resumable_uploads ON public.file_upload_sessions USING btree (user_id, file_name) WHERE (status = 'in_progress'::public.upload_status);
+
+
+--
+-- Name: companies; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.companies (
+    comp_id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    name character varying(255) NOT NULL,
+    license character varying(255),
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.companies OWNER TO postgres;
+
+
+--
+-- Name: companies companies_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.companies
+    ADD CONSTRAINT companies_pkey PRIMARY KEY (comp_id);
+
+
+--
+-- Name: users users_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(comp_id) ON DELETE SET NULL;
 
 
 --

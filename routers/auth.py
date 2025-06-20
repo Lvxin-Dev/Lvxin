@@ -18,7 +18,7 @@ from core.security import (
     optional_cookie,
 )
 import psycopg2 as pg
-from services.user_management import create_user_folder, save_user_data, create_user_in_db
+from services.user_management import create_user_folder, save_user_data, create_user_in_db, create_company_in_db
 from services.phone_verification import phone_verification_service
 
 logger = logging.getLogger(__name__)
@@ -50,7 +50,7 @@ async def handle_signin(
     try:
         cur = conn.cursor()
         cur.execute("""
-            SELECT user_id, username, email, password FROM users 
+            SELECT user_id, username, email, password, account_type, company_id FROM users 
             WHERE email = %s
         """, (email,))
         user_data = cur.fetchone()
@@ -66,7 +66,7 @@ async def handle_signin(
                 }
             )
 
-        user_id, username, user_email, _ = user_data
+        user_id, username, user_email, _, account_type, company_id = user_data
         
         # NOTE: update_user_login_time is not defined here yet.
         # It should probably be moved to a user service/crud file.
@@ -77,7 +77,9 @@ async def handle_signin(
         session_data = SessionData(
             user_id=str(user_id),
             username=username,
-            email=user_email
+            email=user_email,
+            account_type=account_type,
+            company_id=str(company_id) if company_id else None
         )
         await backend.create(session_id, session_data)
 
@@ -118,18 +120,52 @@ async def signup_form(
     fullname: str = Form(...),
     email: str = Form(...),
     password: str = Form(...),
-    phone: str = Form(...),
-    username: str = Form(...)
+    phone: Optional[str] = Form(None),
+    username: str = Form(...),
+    account_type: str = Form(...),
+    company_name: Optional[str] = Form(None),
+    license_num: Optional[str] = Form(None)
 ):
     try:
         hashed_password = get_password_hash(password)
-        new_user = create_user_in_db(
-            fullname=fullname,
-            email=email,
-            password=hashed_password,
-            phone=phone,
-            username=username
-        )
+        
+        if account_type == "company":
+            if not company_name:
+                return templates.TemplateResponse(
+                    "signup.html",
+                    {"request": request, "error_message": "Company name is required for company accounts."},
+                )
+            if not email:
+                return templates.TemplateResponse(
+                    "signup.html",
+                    {"request": request, "error_message": "Email is required for company accounts."},
+                )
+            # Create the company first
+            new_company = create_company_in_db(company_name, license_num)
+            if not new_company:
+                return templates.TemplateResponse(
+                    "signup.html",
+                    {"request": request, "error_message": "A company with this name already exists."},
+                )
+            
+            # Then create the user as a company admin
+            new_user = create_user_in_db(
+                fullname=fullname,
+                email=email,
+                password=hashed_password,
+                phone=phone,
+                username=username,
+                account_type='company_admin',
+                company_id=new_company['comp_id']
+            )
+        else: # Individual account
+            new_user = create_user_in_db(
+                fullname=fullname,
+                email=email,
+                password=hashed_password,
+                phone=phone,
+                username=username
+            )
 
         if not new_user:
             return templates.TemplateResponse(
@@ -253,57 +289,64 @@ async def login_via_google(request: Request):
 
 @router.get('/auth/google')
 async def auth_via_google(request: Request):
-    try:
-        token = await oauth.google.authorize_access_token(request)
-    except Exception as error:
-        logger.error(f"Google OAuth Error: {error}")
-        return HTMLResponse(f'<h1>Error: {error.error}</h1><p>Description: {error.description}</p>')
-    
+    token = await oauth.google.authorize_access_token(request)
     user_info = token.get('userinfo')
+    
     if not user_info:
-        return HTMLResponse("<h1>Could not fetch user info from Google.</h1>", status_code=400)
+        raise HTTPException(status_code=400, detail="Could not retrieve user info from Google.")
 
     email = user_info.get("email")
     conn = get_db_connection()
-    cur = conn.cursor()
-
     try:
-        cur.execute("SELECT user_id, username, email FROM users WHERE email = %s", (email,))
-        user = cur.fetchone()
-        
-        if not user:
-            # Create new user
-            user_id = str(uuid4())
-            username = email.split('@')[0] + str(secrets.randbelow(1000))
-            full_name = user_info.get("name", "New User")
-            hashed_password = get_password_hash(secrets.token_hex(16)) # Random password
-
-            cur.execute(
-                "INSERT INTO users (user_id, username, password, full_name, email) VALUES (%s, %s, %s, %s, %s) RETURNING user_id, username, email",
-                (user_id, username, hashed_password, full_name, email),
-            )
+        with conn.cursor() as cur:
+            cur.execute("SELECT user_id, username, email, account_type, company_id FROM users WHERE email = %s", (email,))
             user = cur.fetchone()
-            conn.commit()
-            create_user_folder(user[0], user[1])
-            save_user_data(user[0], user[1], full_name, user[2])
+
+            if not user:
+                # If user does not exist, create a new one
+                new_user_data = create_user_in_db(
+                    fullname=user_info.get("name", email),
+                    email=email,
+                    password=get_password_hash(secrets.token_urlsafe(16)), # Generate a secure random password
+                    phone=None, # Phone not available from Google
+                    username=user_info.get("name", email).replace(" ", "") + str(uuid4())[:4], # Create a unique username
+                    account_type='individual',
+                    company_id=None
+                )
+                if not new_user_data:
+                    raise HTTPException(status_code=500, detail="Failed to create a new user.")
+                
+                # Fetch the newly created user to get all details
+                cur.execute("SELECT user_id, username, email, account_type, company_id FROM users WHERE user_id = %s", (new_user_data['user_id'],))
+                user = cur.fetchone()
+
+        if not user:
+             raise HTTPException(status_code=404, detail="User not found after creation.")
 
         logger.info(f"User data from DB: {user}")
+        
+        user_id, username, user_email, account_type, company_id = user
+        
         session_id = uuid4()
-        session_data = SessionData(user_id=str(user[0]), username=user[1], email=user[2])
-        logger.info(f"Session data to be created: {session_data}")
+        session_data = SessionData(
+            user_id=str(user_id), 
+            username=username, 
+            email=user_email,
+            account_type=account_type,
+            company_id=str(company_id) if company_id else None
+        )
         await backend.create(session_id, session_data)
 
-        response = RedirectResponse(url="/mydash", status_code=status.HTTP_303_SEE_OTHER)
+        response = RedirectResponse(url="/mydash")
         cookie.attach_to_response(response, session_id)
         return response
 
-    except pg.Error as e:
-        conn.rollback()
-        logger.error(f"Database error during Google auth: {e}")
-        return HTMLResponse("<h1>Database Error</h1><p>Could not process your request.</p>", status_code=500)
+    except Exception as e:
+        logger.error(f"Error in Google auth callback: {e}")
+        raise HTTPException(status_code=500, detail="An internal error occurred during Google authentication.")
     finally:
-        cur.close()
-        release_db_connection(conn)
+        if conn:
+            release_db_connection(conn)
 
 
 @router.post("/logout")

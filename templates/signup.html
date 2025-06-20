@@ -334,9 +334,31 @@
                 {{ error_message }}
             </div>
             {% endif %}
+            
+            <div class="form-group" style="text-align: center;">
+                <label style="display: inline-block; margin-right: 20px;">
+                    <input type="radio" name="account_type_selector" value="individual" checked> Individual
+                </label>
+                <label style="display: inline-block;">
+                    <input type="radio" name="account_type_selector" value="company"> Company
+                </label>
+            </div>
 
             <div id="email-form-container">
                 <form id="user-email-form" action='/signup' method="POST">
+                    <input type="hidden" name="account_type" value="individual">
+                    
+                    <div id="company-details" class="hidden">
+                        <div class="form-group">
+                            <label for="company_name">Company Name</label>
+                            <input type="text" id="company_name" name="company_name">
+                        </div>
+                        <div class="form-group">
+                            <label for="license_num">License Number (Optional)</label>
+                            <input type="text" id="license_num" name="license_num">
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label for="fullname">Full Name</label>
                         <input type="text" id="fullname" name="fullname"  required>
@@ -359,13 +381,14 @@
 
             <div id="phone-form-container" class="hidden">
                 <form id="phone-signup-form" method="POST">
+                     <input type="hidden" name="account_type" value="individual">
                     <div class="input-group">
                         <i class="fas fa-user"></i>
-                        <input type="text" id="username" name="username" data-i18n="[placeholder]signup.username" placeholder="Username" required />
+                        <input type="text" id="username-phone" name="username" data-i18n="[placeholder]signup.username" placeholder="Username" required />
                     </div>
                     <div class="input-group">
                         <i class="fas fa-key"></i>
-                        <input type="password" id="password" name="password" data-i18n="[placeholder]signup.password" placeholder="Password" required />
+                        <input type="password" id="password-phone" name="password" data-i18n="[placeholder]signup.password" placeholder="Password" required />
                     </div>
                     <div class="input-group phone-group">
                         <i class="fas fa-phone"></i>
@@ -403,6 +426,33 @@
                 const emailForm = document.getElementById('email-form-container');
                 const phoneForm = document.getElementById('phone-form-container');
 
+                const accountTypeRadios = document.querySelectorAll('input[name="account_type_selector"]');
+                const companyDetails = document.getElementById('company-details');
+                const companyNameInput = document.getElementById('company_name');
+                const emailFormAccountType = document.querySelector('#user-email-form input[name="account_type"]');
+                const phoneFormAccountType = document.querySelector('#phone-signup-form input[name="account_type"]');
+
+                accountTypeRadios.forEach(radio => {
+                    radio.addEventListener('change', (event) => {
+                        const accountType = event.target.value;
+                        emailFormAccountType.value = accountType;
+                        phoneFormAccountType.value = accountType; // Keep both forms in sync
+                        
+                        if (accountType === 'company') {
+                            companyDetails.classList.remove('hidden');
+                            companyNameInput.required = true;
+                            // When company is selected, force email signup and hide phone option
+                            switchForm('email');
+                            phoneOption.classList.add('hidden');
+                        } else {
+                            companyDetails.classList.add('hidden');
+                            companyNameInput.required = false;
+                            // Show phone option again for individuals
+                            phoneOption.classList.remove('hidden');
+                        }
+                    });
+                });
+
                 function switchForm(activeOption) {
                     emailOption.classList.remove('active');
                     phoneOption.classList.remove('active');
@@ -421,7 +471,7 @@
                 emailOption.addEventListener('click', () => switchForm('email'));
                 phoneOption.addEventListener('click', () => switchForm('phone'));
 
-                // Initialize with email form active
+                // Initial setup
                 switchForm('email');
             });
         </script>

@@ -9,6 +9,7 @@ from fastapi_sessions.frontends.implementations import SessionCookie, CookiePara
 from core.config import SESSION_SECRET_KEY
 from core.database import get_redis_connection, get_db_connection, release_db_connection
 from core.redis_backend import RedisBackend
+from typing import Optional
 
 # --- Password Hashing ---
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -26,6 +27,8 @@ class SessionData(BaseModel):
     user_id: str
     username: str
     email: str
+    account_type: str
+    company_id: Optional[str] = None
 
 # Redis backend for session storage
 redis_client = get_redis_connection()

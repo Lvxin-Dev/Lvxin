@@ -26,8 +26,9 @@ from core.security import SessionData, cookie, backend, verifier
 from core.config import oauth
 from typing import Optional, List
 import urllib.parse
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, validator
 from fastapi import status
+import phonenumbers
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -35,8 +36,24 @@ logger = logging.getLogger(__name__)
 
 # Pydantic models for request bodies
 class ProfileUpdate(BaseModel):
-    new_password: str
-    email: EmailStr
+    full_name: str
+    phone: Optional[str] = None
+    language: Optional[str] = None
+    country: Optional[str] = None
+    current_password: str
+    new_password: Optional[str] = None
+
+    @validator('phone')
+    def validate_phone(cls, v):
+        if v is None:
+            return v
+        try:
+            p = phonenumbers.parse(v, None)
+            if not phonenumbers.is_valid_number(p):
+                raise ValueError("Invalid phone number")
+            return phonenumbers.format_number(p, phonenumbers.PhoneNumberFormat.E164)
+        except phonenumbers.phonenumberutil.NumberParseException:
+            raise ValueError("Invalid phone number format")
 
 class Feedback(BaseModel):
     rating: int
@@ -235,17 +252,60 @@ async def chat_page(req: Request, session_id: UUID = Depends(cookie)):
 # --- POST Handlers ---
 async def profile_changes_handler(req: Request, profile_data: ProfileUpdate, session_id: UUID = Depends(cookie)):
     session_data = await verifier(req)
-    hashed_password = get_password_hash(profile_data.new_password)
     conn = get_db_connection()
     try:
         cur = conn.cursor()
+        
+        # 1. Verify current password
+        cur.execute("SELECT password FROM users WHERE user_id = %s", (session_data.user_id,))
+        user_record = cur.fetchone()
+
+        if not user_record or not verify_password(profile_data.current_password, user_record[0]):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect current password."
+            )
+        
+        # 2. Update profile information
         cur.execute(
-            "UPDATE users SET password = %s, email = %s WHERE user_id = %s",
-            (hashed_password, profile_data.email, session_data.user_id),
+            """
+            UPDATE users 
+            SET full_name = %s, language = %s, country = %s, phone = %s 
+            WHERE user_id = %s
+            """,
+            (profile_data.full_name, profile_data.language, profile_data.country, profile_data.phone, session_data.user_id),
         )
+
+        # 3. Update password if a new one is provided
+        if profile_data.new_password:
+            hashed_password = get_password_hash(profile_data.new_password)
+            cur.execute(
+                "UPDATE users SET password = %s WHERE user_id = %s",
+                (hashed_password, session_data.user_id),
+            )
+        
         conn.commit()
+
+        # 4. Update the user's JSON file cache
+        user_json_data = reach_json(session_data)
+        save_user_data(
+            user_id=session_data.user_id,
+            username=session_data.username,
+            full_name=profile_data.full_name,
+            email=user_json_data.get('email'), # email is not changed here
+            # other fields from json if needed
+        )
+
+    except HTTPException as e:
+        conn.rollback()
+        raise e
+    except Exception as e:
+        conn.rollback()
+        logger.error(f"Error during profile update for user {session_data.user_id}: {e}")
+        raise HTTPException(status_code=500, detail="An internal error occurred.")
     finally:
         release_db_connection(conn)
+        
     return RedirectResponse(url="/profile", status_code=status.HTTP_303_SEE_OTHER)
 
 async def delete_file_handler(req: Request, filename: str = Form(...), session_id: UUID = Depends(cookie)):
