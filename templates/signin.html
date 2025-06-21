@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="signin_title">LVXIN - Sign In</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body {
+        font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-zinc-900 text-gray-200">
+  <div class="flex h-screen w-screen">
+    <div class="flex-1 flex items-center justify-center">
+      <div class="bg-zinc-800 rounded-2xl shadow-2xl p-8 w-full max-w-md flex flex-col items-center gap-4">
+        <div class="logo mb-2">
+          <img src="../static/images/logo.jpg" alt="LVXIN Logo" class="w-14 h-14 rounded-xl bg-white shadow-md object-cover">
+        </div>
+        <h1 class="text-2xl font-bold tracking-tight text-gray-100" data-i18n="signin_header">Sign in to LVXIN</h1>
+        <div class="absolute top-4 right-4">
+            <select id="language-selector" class="language-selector" aria-label="Language selector" style="background-color: #3f3f46; color: #d4d4d8; border: 1px solid #52525b; border-radius: 5px; padding: 0.3rem 0.5rem; margin-right: 0.5rem;">
+                <option value="en">English</option>
+                <option value="zh">中文</option>
+            </select>
+        </div>
+        <div class="w-full mb-2">
+            <a href="/login/google" class="w-full flex items-center justify-center gap-2.5 py-3 rounded-lg text-sm font-semibold border border-gray-400 bg-white text-black hover:shadow-lg hover:border-indigo-500 transition-all">
+                <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo" class="w-5 h-5"/>
+                <span data-i18n="signin_with_google">Sign in with Google</span>
+            </a>
+        </div>
+        <div class="relative w-full text-center text-gray-400 text-sm my-2">
+            <span class="before:content-[''] before:inline-block before:w-2/5 before:h-px before:bg-zinc-700 before:align-middle before:mx-2 after:content-[''] after:inline-block after:w-2/5 after:h-px after:bg-zinc-700 after:align-middle after:mx-2" data-i18n="or_separator">or</span>
+        </div>
+        
+        <form action="/signin" method="POST" class="w-full flex flex-col gap-3.5">
+          <input type="hidden" name="next" value="{{ next }}">
+          {% if error_message %}
+          <div class="text-red-400 text-sm text-center mb-2">
+            {{ error_message }}
+          </div>
+          {% endif %}
+          <div class="flex flex-col gap-1.5">
+            <label for="email" class="text-sm font-medium text-gray-400" data-i18n="email_or_username">Email or Username</label>
+            <input type="text" id="email" name="email" placeholder="Enter your email or username" required class="bg-zinc-700 border-2 border-zinc-600 text-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors" data-i18n="[placeholder]email_placeholder">
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label for="password" class="text-sm font-medium text-gray-400" data-i18n="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required class="bg-zinc-700 border-2 border-zinc-600 text-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors" data-i18n="[placeholder]password_placeholder">
+          </div>
+          <button type="submit" class="w-full bg-gradient-to-r from-indigo-500 to-indigo-600 text-white py-3.5 text-sm font-bold rounded-lg mt-1 hover:bg-gradient-to-r hover:from-indigo-600 hover:to-indigo-700 shadow-md hover:shadow-lg transition-all" data-i18n="signin_button">Sign In</button>
+        </form>
+        <div class="w-full flex justify-between mt-2.5 text-sm">
+          <a href="/forgetpassword" class="text-indigo-400 hover:text-indigo-300 hover:underline transition-colors" data-i18n="forgot_password">Forgot password?</a>
+          <a href="/signup" class="text-indigo-400 hover:text-indigo-300 hover:underline transition-colors" data-i18n="signup_link">Sign up</a>
+        </div>
+      </div>
+    </div>
+    <div class="flex-1 hidden lg:flex items-center justify-center bg-gradient-to-br from-black to-indigo-700 relative">
+      <img class="max-w-[95%] max-h-[95%] rounded-2xl shadow-2xl object-cover" src="../static/images/signin.png" alt="Welcome to LVXIN">
+    </div>
+  </div>
+  <script src="https://unpkg.com/i18next/i18next.min.js"></script>
+  <script src="https://unpkg.com/i18next-http-backend/i18nextHttpBackend.min.js"></script>
+  <script src="https://unpkg.com/i18next-browser-languagedetector/i18nextBrowserLanguageDetector.min.js"></script>
+  <script src="../static/JS/i18n.js"></script>
+</body>
+</html> 

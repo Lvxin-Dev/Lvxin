@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="welcome_title">LVXIN - AI Legal Solutions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" type="image/jpeg" href="../static/images/logo.jpg">
+    <link rel="stylesheet" href="../static/CSS/wel.css">
+    <style>
+     
+    </style>
+</head>
+<body>
+    <head>
+    <link rel="icon" type="image/jpeg" href="../static/images/logo.jpg">
+    </head>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="logo">
+            <a href="welcome_page">
+                <img src="../static/images/logo.jpg" alt="律心标志">
+            </a>
+        </div>
+       
+        <div class="actions">
+            <select id="language-selector" class="language-selector" aria-label="Language selector" style="background-color: var(--card-bg); color: var(--text-primary); border: 1px solid var(--border); border-radius: 5px; padding: 0.3rem 0.5rem; margin-right: 0.5rem;">
+                <option value="en">English</option>
+                <option value="zh">中文</option>
+            </select>
+            <button id="themeToggle" class="icon-btn">
+                <i class="fas fa-moon"></i>
+            </button>
+            <script src="https://static.elfsight.com/platform/platform.js" async></script>
+            <div class="elfsight-app-fce75b10-069c-41d5-bca0-09c33e812801" data-elfsight-app-lazy></div>
+            {% if user_is_logged_in %}
+            <a href="/mydash" class="primary-btn en-content" data-i18n="dashboard_link">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            {% else %}
+            <a href="/signin?next=/upload_contract" class="primary-btn en-content" data-i18n="login">
+                <i class="fas fa-sign-in-alt"></i> 登录
+            </a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- 英雄部分 -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="brand-name" data-i18n="brand_name">律心</h1>
+                <h2 data-i18n="hero_title">人工智能法律解决方案</h2>
+                <p data-i18n="hero_subtitle">为现代商业创新提供先进的人工智能法律解决方案</p>
+                <div class="stats-bar">
+                    <div class="stat">
+                        <i class="fas fa-file-contract"></i>
+                        <span data-i18n="contracts_analyzed_stats" data-i18n-options='{"count": "{{contracts_number}}"}'>{{contracts_number}} 份合同已分析</span>
+                    </div>
+                    <div class="stat">
+                        <i class="fas fa-user-tie"></i>
+                        <span data-i18n="users_trust_us_stats" data-i18n-options='{"count": "{{accounts_number}}"}'>{{accounts_number}} 位用户信任我们</span>
+                    </div>
+                </div>
+            </div>
+            <div class="upload-container">
+                <div class="logo-header">
+                    <div class="main-logo" data-i18n="service1_title">服务 1：合同分析</div>
+                    <div class="sub-logo" data-i18n="service1_subtitle">获得对您的合同的清晰专业分析，突出隐藏的风险、缺陷和潜在陷阱，以保护您的利益。</div>
+                    <div style="color:rgb(189, 152, 4); font-weight: bold; font-size: 0.8rem;" data-i18n="ocr_note">注意！（如果您的文件包含图片）我们正在开发OCR功能，在完成之前，请在上传前将您的文档转换为文本</div>
+                </div>
+                <div class="upload-card">
+                    <div class="drag-drop-area">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <div class="upload-instructions" data-i18n="drop_files_or_click">拖放文件到此处或 <strong>点击上传</strong></div>
+                        <div class="file-requirements" data-i18n="supported_files">(支持的文件类型: PDF, DOC, DOCX)</div>
+                        <div class="selected-file" id="selectedFile"></div>
+                    </div>
+                    <input type="file" id="file-input" accept=".pdf,.doc,.docx">
+                    <button class="analyze-btn" id="analyzeBtn" data-i18n="analyze_contract_btn">
+                        <i class="fas fa-rocket"></i> 分析合同
+                    </button>
+                    <div class="progress-container" id="progressContainer">
+                        <div class="progress-bar" id="progressBar">0%</div>
+                    </div>
+                    <div class="status-text" id="statusText"></div>
+                    <div class="upload-controls" id="uploadControls">
+                        <button type="button" id="pauseBtn" class="control-btn pause-btn" data-i18n="pause_upload">暂停</button>
+                        <button type="button" id="resumeBtn" class="control-btn resume-btn" data-i18n="resume_upload">继续</button>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="upload-container">
+                <div class="logo-header">
+                    <div class="main-logo" data-i18n="service2_title">服务2：咨询我们的代理</div>
+                    <div class="sub-logo" data-i18n="service2_subtitle">与我们智能法律代理聊天，快速、清晰地获得针对您法律问题的量身定制解决方案，并由专家逻辑支持。</div>
+                    <a href="/signin?next=/chat" class="analyze-btn" data-i18n="chat_btn">聊天</a>
+                </div>
+
+        </div>
+        
+    </section>
+
+    <!-- 如何运作 -->
+    <div class="container">
+        <section class="how-it-works">
+            <h2 class="section-title" data-i18n="how_it_works">如何运作</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-icon"><i class="fas fa-file-upload"></i></div>
+                    <h3 class="step-title" data-i18n="step1_title">上传</h3>
+                    <p class="step-desc" data-i18n="step1_desc">上传任何支持格式的法律文件</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-icon"><i class="fas fa-brain"></i></div>
+                    <h3 class="step-title" data-i18n="step2_title">人工智能分析</h3>
+                    <p class="step-desc" data-i18n="step2_desc">我们的AI分析文档以识别风险和机会</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-icon"><i class="fas fa-search"></i></div>
+                    <h3 class="step-title" data-i18n="step3_title">审阅</h3>
+                    <p class="step-desc" data-i18n="step3_desc">审阅高亮显示的风险和建议的改进</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-icon"><i class="fas fa-file-download"></i></div>
+                    <h3 class="step-title" data-i18n="step4_title">导出</h3>
+                    <p class="step-desc" data-i18n="step4_desc">导出详细报告和修订后的文档</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 示例结果 -->
+    <div class="container">
+        <section class="sample-results" id="sample-results">
+            <h2 class="section-title" data-i18n="sample_analysis_title">示例分析结果</h2>
+            <div class="result-card">
+                <div class="result-header">
+                    <div class="result-title" data-i18n="sample_contract_title">劳动合同分析</div>
+                    <div data-i18n="sample_result_label">示例结果</div>
+                </div>
+                <div class="result-body">
+                    <div class="risk-item">
+                        <div class="risk-level high" data-i18n="high_risk">高风险</div>
+                        <div class="risk-clause" data-i18n="risk1_clause">第8.2节：竞业禁止条款</div>
+                        <div class="risk-desc" data-i18n="risk1_desc">竞业禁止条款延长至5年，超出大多数司法管辖区的法律可执行限制。建议缩短至1-2年。</div>
+                    </div>
+                    <div class="risk-item">
+                        <div class="risk-level medium" data-i18n="medium_risk">中风险</div>
+                        <div class="risk-clause" data-i18n="risk2_clause">第5.3节：终止通知</div>
+                        <div class="risk-desc" data-i18n="risk2_desc">3天通知期短于许多司法管辖区要求的标准30天通知期，可能导致合规问题。</div>
+                    </div>
+                    <div class="risk-item">
+                        <div class="risk-level low" data-i18n="low_risk">低风险</div>
+                        <div class="risk-clause" data-i18n="risk3_clause">第3.1节：薪酬条款</div>
+                        <div class="risk-desc" data-i18n="risk3_desc">年度薪资审查条款缺乏具体的加薪标准。建议添加绩效指标以提高清晰度。</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 服务 -->
+    <div class="container">
+        <section class="services">
+            <h2 class="section-title" data-i18n="what_we_offer">我们提供的服务</h2>
+            <div class="service-cards">
+                <div class="service-card">
+                    <div class="service-icon"><i class="fas fa-file-contract"></i></div>
+                    <h3 class="service-title" data-i18n="service_card1_title">智能合同审查</h3>
+                    <p class="service-desc" data-i18n="service_card1_desc">人工智能驱动的合同分析和优化，识别风险</p>
+                    <a href="#" class="learn-more" data-i18n="learn_more">了解更多 →</a>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon"><i class="fas fa-chart-line"></i></div>
+                    <h3 class="service-title" data-i18n="service_card2_title">绩效分析</h3>
+                    <p class="service-desc" data-i18n="service_card2_desc">实时业务绩效跟踪和合规监控</p>
+                    <a href="#" class="learn-more" data-i18n="learn_more">了解更多 →</a>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon"><i class="fas fa-search-dollar"></i></div>
+                    <h3 class="service-title" data-i18n="service_card3_title">估值研究</h3>
+                    <p class="service-desc" data-i18n="service_card3_desc">全面的市场估值分析和竞争洞察</p>
+                    <a href="#" class="learn-more" data-i18n="learn_more">了解更多 →</a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 客户评价 -->
+    <div class="container">
+        <section class="testimonials">
+            <h2 class="section-title" data-i18n="customer_success">客户成功案例</h2>
+            <div class="testimonial-card">
+                <div class="quote-mark">"</div>
+                <p class="testimonial-text" data-i18n="testimonial_text">绿信革新了我们的法律运营。我们实现了85%的更快合规检查，并在第一季度将运营成本降低了40%！</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar" data-i18n="testimonial_author_name">张涛</div>
+                    <div class="author-info">
+                        <h4 data-i18n="testimonial_author_name">张涛</h4>
+                        <p data-i18n="testimonial_author_title">深圳科技公司法律总监</p>
+                    </div>
+                </div>
+                <div class="testimonial-metrics">
+                    <div class="metric">
+                        <div class="metric-value" data-i18n="metric1_value">85%</div>
+                        <div class="metric-label" data-i18n="metric1_label">更快合规</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" data-i18n="metric2_value">40%</div>
+                        <div class="metric-label" data-i18n="metric2_label">成本降低</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 行动号召部分 -->
+    <div class="container">
+        <section class="cta-section">
+            <div class="cta-content">
+                <h2 data-i18n="cta_title">今天开始您的AI法律之旅</h2>
+                <p data-i18n="cta_subtitle">使用我们的14天免费试用，无需信用卡即可体验律心。</p>
+                <div class="cta-buttons">
+                    <a href="#" class="cta-btn" data-i18n="cta_btn_primary">开始免费试用</a>
+                    <a href="#" class="secondary-btn" data-i18n="cta_btn_secondary">安排演示</a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-main-content">
+                <div class="footer-columns">
+                    <div class="footer-column">
+                        <h3 data-i18n="footer_company">公司</h3>
+                        <ul>
+                            <li><a href="#" data-i18n="about_us">关于我们</a></li>
+                            <li><a href="#" data-i18n="footer_careers">职业</a></li>
+                            <li><a href="#" data-i18n="footer_news">新闻</a></li>
+                            <li><a href="#" data-i18n="footer_contact">联系</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h3 data-i18n="footer_products">产品</h3>
+                        <ul>
+                            <li><a href="#" data-i18n="features">功能</a></li>
+                            <li><a href="#" data-i18n="footer_pricing">定价</a></li>
+                            <li><a href="#" data-i18n="integrations">集成</a></li>
+                            <li><a href="#" data-i18n="case_studies">案例研究</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h3 data-i18n="footer_resources">资源</h3>
+                        <ul>
+                            <li><a href="#" data-i18n="documentation">文档</a></li>
+                            <li><a href="#" data-i18n="api_status">API状态</a></li>
+                            <li><a href="#" data-i18n="security">安全</a></li>
+                            <li><a href="#" data-i18n="blog">博客</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h3 data-i18n="footer_legal">法律</h3>
+                        <ul>
+                            <li><a href="#" data-i18n="terms_of_service">服务条款</a></li>
+                            <li><a href="#" data-i18n="privacy_policy">隐私政策</a></li>
+                            <li><a href="#" data-i18n="cookie_policy">Cookie政策</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="scanner-showcase">
+                    <div class="scanner-images">
+                        <div class="scanner-card">
+                            <img src="../static/images/we_chat.jpg" alt="WeChat Official Account" class="scanner-img">
+                            <p class="scanner-desc" data-i18n="wechat_official_account">微信公众号</p>
+                        </div>
+                        <div class="scanner-card">
+                            <img src="../static/images/red_qr.png" alt="Little Red Book Account" class="scanner-img">
+                            <p class="scanner-desc" data-i18n="little_red_book_account">小红书账户</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="copyright" data-i18n="copyright">
+                    &copy; 2024 LVXIN. All Rights Reserved.
+                </div>
+                <div class="icp-link">
+                    <a href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank" data-i18n="icp_record">沪ICP备2023012345号</a>
+                </div>
+                <div class="social-icons">
+                    <a href="#" aria-label="WeChat"><i class="fab fa-weixin"></i></a>
+                    <a href="#" aria-label="Sina Weibo"><i class="fab fa-weibo"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        let isDarkMode = localStorage.getItem('darkMode') === 'true';
+
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            document.body.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+            themeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            localStorage.setItem('darkMode', isDarkMode);
+        }
+
+        themeToggle.addEventListener('click', toggleTheme);
+        document.body.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+        themeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+
+        // Resumable Upload Logic
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const fileInput = document.getElementById('file-input');
+        const dragDropArea = document.querySelector('.drag-drop-area');
+        const selectedFileDisplay = document.getElementById('selectedFile');
+
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const statusText = document.getElementById('statusText');
+        const uploadControls = document.getElementById('uploadControls');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resumeBtn = document.getElementById('resumeBtn');
+
+        let currentFile = null;
+        let uploadId = null;
+        let isPaused = false;
+        const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
+
+        dragDropArea.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => handleFileSelect(e.target.files[0]));
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dragDropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        dragDropArea.addEventListener('dragenter', () => dragDropArea.classList.add('dragover'));
+        dragDropArea.addEventListener('dragleave', () => dragDropArea.classList.remove('dragover'));
+        dragDropArea.addEventListener('drop', (e) => {
+            dragDropArea.classList.remove('dragover');
+            handleFileSelect(e.dataTransfer.files[0]);
+        });
+
+        function handleFileSelect(file) {
+            if (!file) return;
+            currentFile = file;
+            selectedFileDisplay.textContent = `Selected File: ${file.name}`;
+            resetUploadState();
+        }
+
+        function resetUploadState() {
+            uploadId = null;
+            isPaused = false;
+            progressContainer.style.display = 'none';
+            progressBar.style.width = '0%';
+            progressBar.textContent = '0%';
+            statusText.style.display = 'none';
+            statusText.textContent = '';
+            uploadControls.style.display = 'none';
+        }
+
+        analyzeBtn.addEventListener('click', async () => {
+            if (!currentFile) {
+                alert("Please select a file to upload.");
+                return;
+            }
+            isPaused = false;
+            await startOrResumeUpload();
+        });
+
+        pauseBtn.addEventListener('click', () => {
+            isPaused = true;
+            statusText.textContent = 'Paused';
+        });
+
+        resumeBtn.addEventListener('click', async () => {
+            isPaused = false;
+            statusText.textContent = 'Resuming...';
+            await startOrResumeUpload();
+        });
+
+        async function startOrResumeUpload() {
+            statusText.style.display = 'block';
+            progressContainer.style.display = 'block';
+            uploadControls.style.display = 'flex';
+
+            if (!uploadId) {
+                // Check if a resumable session exists
+                try {
+                    statusText.textContent = 'Checking for existing uploads...';
+                    const res = await fetch(`/uploads/status?file_name=${encodeURIComponent(currentFile.name)}`);
+                    if (res.status === 401) {
+                        window.location.href = '/signin';
+                        return;
+                    }
+                    if (!res.ok) throw new Error('Failed to check status');
+                    const data = await res.json();
+
+                    if (data.resumable) {
+                        const resume = confirm(`An incomplete upload was found for ${currentFile.name}. Do you want to resume?`);
+                        if (resume) {
+                            uploadId = data.upload_id;
+                            await uploadChunks(data.uploaded_size);
+                            return;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Could not check for resumable upload:', error);
+                }
+
+                // If not resuming, initiate a new upload
+                try {
+                    statusText.textContent = 'Initiating upload...';
+                    const initRes = await fetch('/uploads/initiate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            file_name: currentFile.name,
+                            file_size: currentFile.size,
+                            mime_type: currentFile.type
+                        })
+                    });
+                    if (initRes.status === 401) {
+                        window.location.href = '/signin';
+                        return;
+                    }
+                    if (!initRes.ok) throw new Error('Failed to initiate upload');
+                    const initData = await initRes.json();
+                    uploadId = initData.upload_id;
+                    await uploadChunks(0);
+                } catch (error) {
+                    console.error('Upload initiation failed:', error);
+                    statusText.textContent = `Error: ${error.message}`;
+                }
+
+            } else {
+                const uploadedSize = parseFloat(progressBar.style.width) / 100 * currentFile.size;
+                await uploadChunks(uploadedSize);
+            }
+        }
+
+        async function uploadChunks(startFrom) {
+            let start = startFrom;
+            statusText.textContent = 'Uploading...';
+
+            while (start < currentFile.size) {
+                if (isPaused) return;
+
+                const end = Math.min(start + CHUNK_SIZE, currentFile.size);
+                const chunk = currentFile.slice(start, end);
+                
+                try {
+                    const formData = new FormData();
+                    formData.append('chunk', chunk, currentFile.name);
+
+                    const res = await fetch(`/uploads/${uploadId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Range': `bytes ${start}-${end-1}/${currentFile.size}`
+                        },
+                        body: formData
+                    });
+
+                    if (res.status === 401) {
+                        window.location.href = '/signin';
+                        return;
+                    }
+                    if (!res.ok) {
+                       throw new Error(`Chunk upload failed with status ${res.status}`);
+                    }
+                    
+                    const data = await res.json();
+                    start = data.uploaded_size;
+
+                    const percentComplete = Math.round((start / currentFile.size) * 100);
+                    progressBar.style.width = `${percentComplete}%`;
+                    progressBar.textContent = `${percentComplete}%`;
+
+                } catch (error) {
+                    console.error('Chunk upload error:', error);
+                    statusText.textContent = `Error: ${error.message}. Retrying might be possible.`;
+                    isPaused = true;
+                    return;
+                }
+            }
+
+            if(start >= currentFile.size) {
+                 await finishUpload();
+            }
+        }
+
+        async function finishUpload() {
+            statusText.textContent = 'Finalizing upload...';
+            try {
+                const res = await fetch(`/uploads/${uploadId}/finish`, {
+                    method: 'POST'
+                });
+                if (res.status === 401) {
+                    window.location.href = '/signin';
+                    return;
+                }
+                if (!res.ok) throw new Error('Failed to finalize upload');
+                
+                statusText.textContent = 'Upload complete! Analysis started.';
+                uploadControls.style.display = 'none';
+                
+                const data = await res.json();
+                alert(data.message);
+                window.location.href = `/analysis?filename=${data.filename}`;
+
+            } catch (error) {
+                console.error('Finish upload error:', error);
+                statusText.textContent = `Error: ${error.message}`;
+            }
+        }
+
+    </script>
+    <script src="https://unpkg.com/i18next/i18next.min.js"></script>
+    <script src="https://unpkg.com/i18next-http-backend/i18nextHttpBackend.min.js"></script>
+    <script src="https://unpkg.com/i18next-browser-languagedetector/i18nextBrowserLanguageDetector.min.js"></script>
+    <script src="../static/JS/i18n.js"></script>
+    <script src="../static/JS/upload.js"></script>
+</body>
+</html>

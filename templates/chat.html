@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LVXIN Legal - Chat Engine</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Poppins font and FontAwesome for icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #4a90e2;
+      --secondary: #50e3c2;
+      --gradient-start: #4a90e2;
+      --gradient-end: #50e3c2;
+      --sidebar-bg: linear-gradient(180deg, var(--primary), var(--secondary));
+      --navbar-bg: #fff;
+      --navbar-bg-dark: #23272f;
+      --card-bg: #fff;
+      --card-bg-dark: #23272f;
+      --body-bg: #f5f7fa;
+      --body-bg-dark: #181c23;
+      --text-primary: #23272f;
+      --text-primary-dark:rgb(0, 0, 0);
+      --text-secondary: #6b7a90;
+      --text-secondary-dark: #b0b8c1;
+    }
+    [data-theme="dark"] {
+      --navbar-bg: var(--navbar-bg-dark);
+      --card-bg: var(--card-bg-dark);
+      --body-bg: var(--body-bg-dark);
+      --text-primary: var(--text-primary-dark);
+      --text-secondary: var(--text-secondary-dark);
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
+      background: var(--body-bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 80px;
+      background: var(--navbar-bg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(74, 144, 226, 0.07);
+    }
+    .logo img {
+      height: 48px;
+      border-radius: 8px;
+    }
+    .nav-links a {
+      margin: 0 1rem;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: var(--primary);
+      margin-right: 0.5rem;
+    }
+    .profile-component {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 500;
+      gap: 0.5rem;
+    }
+    .profile-image {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .profile-name {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+    .sidebar {
+      position: fixed;
+      top: 80px;
+      left: 0;
+      width: 240px;
+      height: calc(100vh - 80px);
+      background: var(--sidebar-bg);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      padding: 2rem 1rem 1rem 1rem;
+      z-index: 90;
+      box-shadow: 2px 0 8px rgba(74, 144, 226, 0.07);
+    }
+    .nav-section {
+      margin-bottom: 2rem;
+    }
+    .nav-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      letter-spacing: 1px;
+      color: #fff;
+      opacity: 0.8;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.7rem 1rem;
+      border-radius: 8px;
+      color: #fff;
+      text-decoration: none;
+      font-size: 1rem;
+      margin-bottom: 0.3rem;
+      transition: background 0.2s;
+    }
+    .nav-item.active, .nav-item:hover {
+      background: rgba(255,255,255,0.15);
+    }
+.main-content {
+  margin-left: 260px; /* match .gpt-sidebar width */
+  margin-top: 80px;
+  height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+  background: var(--body-bg);
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+}
+    /* Chat Engine Styles (adapted to card style) */
+
+.chat-header {
+  height: 64px;
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #fff;
+  letter-spacing: 1px;
+  border-bottom: 1px solid #e3e8f0;
+  top: 80px;
+  left: 260px; /* match .gpt-sidebar width */
+  right: 0;
+  z-index: 10;
+  position: fixed; /* add this if not already */
+}
+.chat-messages {
+  position: absolute;
+  top: 64px; /* height of .chat-header */
+  bottom: 80px; /* height of input area */
+  left: 0;
+  right: 0;
+  padding: 24px 0 24px 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: var(--body-bg);
+}
+
+    .message {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 1rem;
+      line-height: 1.5;
+      word-break: break-word;
+      box-shadow: 0 2px 8px rgba(74,144,226,0.10);
+      animation: fadeIn 0.3s;
+    }
+    .message.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      color: #fff;
+      margin-right: 24px;
+    }
+    .message.assistant {
+      align-self: flex-start;
+      background: var(--card-bg);
+      color: var(--text-primary);
+      margin-left: 24px;
+    }
+
+.chat-input-area {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: var(--navbar-bg);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  border-top: 1px solid #e3e8f0;
+}
+#chat-form {
+  width: 100%;
+  display: flex;
+  gap: 16px;
+}
+#message-input {
+  flex: 1;
+  height: 48px;
+  border-radius: 24px;
+  border: 1px solid #e3e8f0;
+  padding: 0 24px;
+  font-size: 1rem;
+  font-family: 'Poppins', sans-serif;
+  background: var(--body-bg);
+  color: var(--text-primary);
+  transition: all .3s;
+}
+#message-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(74,144,226,0.2);
+}
+#send-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  font-size: 1.3rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .3s;
+}
+#send-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(74,144,226,0.3);
+}
+#send-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.typing-indicator {
+  display: flex;
+  padding: 10px;
+}
+
+.typing-indicator div {
+  width: 8px;
+  height: 8px;
+  margin: 0 2px;
+  background-color: var(--primary);
+  border-radius: 50%;
+  animation: typing 1.4s infinite;
+}
+
+.typing-indicator div:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator div:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing {
+  0%, 40%, 100% {
+    transform: scaleY(0.4);
+  }
+  20% {
+    transform: scaleY(1);
+  }
+}
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <a href="/welcome_page" class="logo">
+      <img src="{{ url_for('static', path='logo.png') }}" alt="LVXIN Logo">
+    </a>
+    <nav class="nav-links">
+      <a href="/welcome_page">Home</a>
+      <a href="/#features">Features</a>
+      <a href="/#pricing">Pricing</a>
+      <a href="/contactus">Contact Us</a>
+    </nav>
+    <div class="actions">
+      <button class="icon-btn" id="theme-toggle"><i class="fas fa-moon"></i></button>
+      {% if user %}
+        <a href="/profile" class="profile-component">
+          <img src="{{ user.user_metadata.get('picture', url_for('static', path='default-avatar.png')) }}" alt="Profile" class="profile-image">
+          <span class="profile-name">{{ user.user_metadata.get('name', 'User') }}</span>
+        </a>
+      {% else %}
+        <a href="/login" class="btn primary">Log In</a>
+      {% endif %}
+    </div>
+  </div>
+  <div class="sidebar">
+    <div class="nav-section">
+      <div class="nav-title">MENU</div>
+      <a href="/mydash" class="nav-item">
+        <i class="fas fa-th-large"></i> Dashboard
+      </a>
+      <a href="/analysis" class="nav-item">
+        <i class="fas fa-file-alt"></i> New Analysis
+      </a>
+      <a href="/history" class="nav-item">
+        <i class="fas fa-history"></i> History
+      </a>
+      <a href="/chat" class="nav-item active">
+        <i class="fas fa-comments"></i> AI Chat
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-title">ACCOUNT</div>
+      <a href="/profile" class="nav-item">
+        <i class="fas fa-user-circle"></i> Profile
+      </a>
+      <a href="/subscriptions" class="nav-item">
+        <i class="fas fa-credit-card"></i> Subscriptions
+      </a>
+    </div>
+    <div class="nav-section" style="margin-top:auto;">
+      <a href="/helpcenter" class="nav-item">
+        <i class="fas fa-question-circle"></i> Help Center
+      </a>
+      <a href="/logout" class="nav-item">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </a>
+    </div>
+  </div>
+  <div class="main-content">
+    <header class="chat-header">
+      Legal AI Chat
+    </header>
+    <div class="chat-messages" id="chat-messages">
+      <div class="message assistant">
+        Welcome to LVXIN's Legal AI. How can I assist you today? Please note that this is an AI assistant and its advice may not be perfect. Always consult with a qualified legal professional for critical matters.
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <form id="chat-form">
+        <input type="text" id="message-input" placeholder="Type your legal question here..." autocomplete="off">
+        <button type="submit" id="send-btn">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const chatForm = document.getElementById('chat-form');
+      const messageInput = document.getElementById('message-input');
+      const chatMessages = document.getElementById('chat-messages');
+      const sendBtn = document.getElementById('send-btn');
+      const themeToggle = document.getElementById('theme-toggle');
+
+      // --- Theme Toggler ---
+      const currentTheme = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', currentTheme);
+      themeToggle.innerHTML = currentTheme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+
+      themeToggle.addEventListener('click', () => {
+        let theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        themeToggle.innerHTML = theme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+      });
+
+
+      // --- Chat Functionality ---
+      function addMessage(content, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', sender);
+        // Use a safer method to set content for user messages
+        if (sender === 'user') {
+            const p = document.createElement('p');
+            p.textContent = content;
+            messageDiv.appendChild(p);
+        } else {
+            // This is where the formatted HTML from the server is injected
+            messageDiv.innerHTML = content;
+        }
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      chatForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const message = messageInput.value.trim();
+        if (!message) return;
+
+        addMessage(message, 'user');
+        messageInput.value = '';
+        
+        addMessage('<div class="typing-indicator"><div></div><div></div><div></div></div>', 'assistant');
+        sendBtn.disabled = true;
+
+        try {
+          const response = await fetch('/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ message: message })
+          });
+          
+          chatMessages.removeChild(chatMessages.lastChild);
+
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ detail: 'Invalid JSON response from server.' }));
+            throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          if (data.formatted_html) {
+            addMessage(data.formatted_html, 'assistant');
+          } else {
+            throw new Error("Received empty response from server.");
+          }
+
+        } catch (error) {
+          console.error('Chat error:', error);
+          // Ensure the loading indicator is removed on error as well
+          const loadingIndicator = chatMessages.querySelector('.typing-indicator');
+          if (loadingIndicator) {
+              loadingIndicator.parentElement.remove();
+          }
+          addMessage(`Sorry, something went wrong. Please try again later. <br><small>${error.message}</small>`, 'assistant error');
+        } finally {
+            sendBtn.disabled = false;
+            messageInput.focus();
+        }
+      });
+    });
+  </script>
+</body>
+</html> 
